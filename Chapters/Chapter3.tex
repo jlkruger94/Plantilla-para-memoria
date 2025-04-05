@@ -8,7 +8,7 @@ En la figura \ref{fig:d_bloques} se muestra el diagrama en bloques general del s
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=.5]{./Figures/d_bloques.png}
+\includegraphics[scale=.4]{./Figures/d_bloques.png}
 	\caption{Diagrama de bloques del sistema.}
 	\label{fig:d_bloques}
 \end{figure}
@@ -58,285 +58,93 @@ El patrón de control ambiental se adoptó como estrategia arquitectónica para 
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=.5]{./Figures/arq_bloques.png}
+\includegraphics[scale=.4]{./Figures/arq_bloques.png}
 	\caption{Diagrama de módulos funcionales y sus interacciones.}
-	\label{fig:d_bloques}
+	\label{fig:arq_bloques}
 \end{figure}
 
-Si en el texto se hace alusión a diferentes partes del trabajo referirse a ellas como capítulo, sección o subsección según corresponda. Por ejemplo: ``En el capítulo \ref{Chapter1} se explica tal cosa'', o ``En la sección \ref{sec:ejemplo} se presenta lo que sea'', o ``En la subsección \ref{subsec:ejemplo} se discute otra cosa''.
 
-Cuando se quiere poner una lista tabulada, se hace así:
+\subsection{Componentes}
+
+La capa de aplicación, figura \ref{fig:arq_bloques}, esta constituida por los componentes de software encargados de gestionar cada una de las funcionalidades del sistema.
+A continuación, se describe brevemente la funcionalidad de cada uno de estos componentes.
 
 \begin{itemize}
-	\item Este es el primer elemento de la lista.
-	\item Este es el segundo elemento de la lista.
+	\item Monitor de temperatura: mide la temperatura de la solución nutritiva para garantizar que las plantas crezcan en un entorno térmicamente adecuado.
+	\item Monitor de conductividad eléctrica (CE): evalúa la concentración de nutrientes presentes en la solución hidropónica.
+	\item Monitor de nivel: monitorea que el nivel de solución nutritiva en el sistema no caiga por debajo de un valor determinado.
+	\item Monitor de pH: mide el nivel de acidez de la solución nutritiva, lo que ayuda a mantener el pH dentro del rango óptimo para el cultivo.
+	\item Monitor de humedad del sustrato: mide el contenido de humedad en el sustrato del cultivo.
+	\item Monitor de luz: mide la cantidad de luz disponible en el entorno a través de un sensor.
+	\item Servidor web embebido: el servidor web embebido permite la comunicación con el sistema de control del cultivo a través de la red. Este servidor permite monitorear, configurar y controlar el sistema desde cualquier dispositivo con acceso a la red.
+	\item Control de ciclo de luz: el control de ciclo de luz administra el encendido y apagado de las luces. Según los parámetros de crecimiento de las plantas configurados, ajusta la duración para optimizar la fotosíntesis y el desarrollo de las plantas.
+	\item Control de ciclo de oxigenación / ventilación: este componente activa y desactiva el flujo de aire en el sistema de cultivo según la configuración del usuario.
+	\item Este sistema gestiona el riego, activa bombas de agua y ajusta los niveles de humedad del sustrato según las mediciones del sensor de humedad. Esto asegura la cantidad adecuada de agua para el desarrollo de las plantas.
+	\item Administrador: es el componente encargado de la centralización y validación global de los datos suministrados por los demás módulos de software.
 \end{itemize}
 
-Notar el uso de las mayúsculas y el punto al final de cada elemento.
+\section{Desarrollo del software}
 
-Si se desea poner una lista numerada el formato es este:
+Para facilitar la escalabilidad de la aplicación, se implementó una tarea de FreeRTOS para cada componente del firmware. Esta arquitectura modular permite modificar cada componente de forma independiente, sin afectar al resto del sistema.
 
-\begin{enumerate}
-	\item Este es el primer elemento de la lista.
-	\item Este es el segundo elemento de la lista.
-\end{enumerate}
+\subsection{Gestión de la comunicación entre tareas}
+La comunicación entre tareas se gestiona mediante un patrón de publicación/suscripción, con múltiples canales, utilizando colas de FreeRTOS como buffers para el intercambio de datos. Esta arquitectura desacopla los productores de información (ej., monitores) de los consumidores (ej., controlador, administrador), lo que garantiza la integridad de los datos y la estabilidad del sistema al evitar condiciones de carrera.
 
-Notar el uso de las mayúsculas y el punto al final de cada elemento.
+\subsection{Gestión de la prioridad}
+Durante el desarrollo del firmware, se abordó la organización de las tareas considerando el clásico problema de productores-consumidores. Esta estrategia permitió estructurar el sistema en función del flujo de información entre tareas.
 
-\subsection{Este es el título de una subsección}
-\label{subsec:ejemplo}
+Se definieron los monitores como tareas productoras, encargadas de obtener datos del entorno mediante sensores y publicarlos en estructuras compartidas .
 
-Se recomienda no utilizar \textbf{texto en negritas} en ningún párrafo, ni tampoco texto \underline{subrayado}. En cambio sí se debe utilizar \textit{texto en itálicas} para palabras en un idioma extranjero, al menos la primera vez que aparecen en el texto. En el caso de palabras que estamos inventando se deben utilizar ``comillas'', así como también para citas textuales. Por ejemplo, un \textit{digital filter} es una especie de ``selector'' que permite separar ciertos componentes armónicos en particular.
+Se implementaron los controladores como tareas consumidoras, cuya función es tomar decisiones en base a los datos recibidos y accionar los actuadores correspondientes.
 
-La escritura debe ser impersonal. Por ejemplo, no utilizar ``el diseño del firmware lo hice de acuerdo con tal principio'', sino ``el firmware fue diseñado utilizando tal principio''. 
+Se desarrolló una tarea de administrador, también consumidora, responsable de coordinar el funcionamiento general del sistema y gestionar configuraciones.
 
-El trabajo es algo que al momento de escribir la memoria se supone que ya está concluido, entonces todo lo que se refiera a hacer el trabajo se narra en tiempo pasado, porque es algo que ya ocurrió. Por ejemplo, "se diseñó el firmware empleando la técnica de test driven development".
+El servidor embebido fue programado con un doble rol: responde a eventos generados por el usuario (como solicitudes de información o configuraciones), y también produce eventos que otras tareas consumen, como actualizaciones de parámetros.
 
-En cambio, la memoria es algo que está vivo cada vez que el lector la lee. Por eso transcurre siempre en tiempo presente, como por ejemplo:
+Se asignaron diferentes niveles de prioridad a las tareas según su disponibilidad requerida. Las tareas de monitoreo se crearon con prioridad intermedia, mientras que las tareas de control y administración se configuraron con mayor prioridad para asegurar tiempos de respuesta adecuados ante eventos prioritarios. El servidor, al depender de la interacción del usuario, fue asignado prioridad alta.
 
-``En el presente capítulo se da una visión global sobre las distintas pruebas realizadas y los resultados obtenidos. Se explica el modo en que fueron llevados a cabo los test unitarios y las pruebas del sistema''.
+\subsection{Controladores de dispositivos}
 
-Se recomienda no utilizar una sección de glosario sino colocar la descripción de las abreviaturas como parte del mismo cuerpo del texto. Por ejemplo, RTOS (\textit{Real Time Operating System}, Sistema Operativo de Tiempo Real) o en caso de considerarlo apropiado mediante notas a pie de página.
+Se desarrollaron controladores de dispositivos (\textit{device drivers}) dedicados a gestionar directamente las unidades de hardware involucradas en el sistema.
 
-Si se desea indicar alguna página web utilizar el siguiente formato de referencias bibliográficas, dónde las referencias se detallan en la sección de bibliografía de la memoria, utilizado el formato establecido por IEEE en \citep{IEEE:citation}. Por ejemplo, ``el presente trabajo se basa en la plataforma EDU-CIAA-NXP \citep{CIAA}, la cual...''.
+Estos controladores permiten abstraer las operaciones de bajo nivel necesarias para interactuar con sensores y actuadores.
 
-\subsection{Figuras} 
+\subsection{Gestion de fallos}
+El sistema incorpora mecanismos de detección y manejo de fallos tanto a nivel de hardware como de software. Cada tarea cuenta con rutinas de supervisión que permiten identificar comportamientos anómalos o pérdida de respuesta de los dispositivos. En caso de error, se activan procedimientos de contingencia que buscan restablecer el funcionamiento sin comprometer la estabilidad del sistema general.
 
-Al insertar figuras en la memoria se deben considerar determinadas pautas. Para empezar, usar siempre tipografía claramente legible. Luego, tener claro que \textbf{es incorrecto} escribir por ejemplo esto: ``El diseño elegido es un cuadrado, como se ve en la siguiente figura:''
+Por ejemplo, si un sensor deja de enviar datos válidos durante un tiempo determinado, se genera una alerta que es registrada y comunicada al usuario. De igual modo, si un actuador no responde a una orden tras múltiples intentos, se desactiva su uso y se notifica al sistema mediante una bandera de estado.
 
-\begin{figure}[h]
-\centering
-\includegraphics[scale=.45]{./Figures/cuadradoAzul.png}
-\end{figure}
+Además, se implementó un mecanismo de watchdog que reinicia automáticamente el microcontrolador en caso de bloqueo o error crítico no recuperable. La configuración base del usuario se almacena en memoria no volátil (NVS), lo cual permite que el sistema se recupere de cortes de energía sin perder los parámetros definidos.
 
-La forma correcta de utilizar una figura es con referencias cruzadas, por ejemplo: ``Se eligió utilizar un cuadrado azul para el logo, como puede observarse en la figura \ref{fig:cuadradoAzul}''.
+\subsection{Servidor embebido}
+Para facilitar la interacción con el usuario, el sistema cuenta con un servidor embebido basado en HTTP, alojado en la propia ESP32. Este servidor permite exponer una API REST, a través de la cual se puede monitorear el estado del cultivo, consultar los valores de los sensores en tiempo real y ejecutar acciones como el encendido manual de actuadores o la configuración de alertas.
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[scale=.45]{./Figures/cuadradoAzul.png}
-	\caption{Ilustración del cuadrado azul que se eligió para el diseño del logo.}
-	\label{fig:cuadradoAzul}
-\end{figure}
+El servidor opera de forma concurrente con el resto de las tareas del sistema, gracias a la arquitectura multitarea de FreeRTOS. Para garantizar la seguridad de acceso, se implementó un sistema básico de autenticación por usuario y contraseña, que protege las rutas de la API.
 
-El texto de las figuras debe estar siempre en español, excepto que se decida reproducir una figura original tomada de alguna referencia. En ese caso la referencia de la cual se tomó la figura debe ser indicada en el epígrafe de la figura e incluida como una nota al pie, como se ilustra en la figura \ref{fig:palabraIngles}.
+El servidor responde a peticiones HTTP provenientes tanto de navegadores como de la aplicación móvil desarrollada en React Native, la cual primero transmite las credenciales de red por Bluetooth para iniciar la conexión WiFi y luego se comunica mediante la API expuesta.
 
-\begin{figure}[htpb]
-	\centering
-	\includegraphics[scale=.3]{./Figures/word.jpeg}
-	\caption{Imagen tomada de la página oficial del procesador\protect\footnotemark.}
-	\label{fig:palabraIngles}
-\end{figure}
+Este servidor embebido representa un componente clave para el monitoreo remoto y la escalabilidad del sistema, ya que permite una integración sencilla con otras plataformas IoT o bases de datos externas si se desea en el futuro.
 
-\footnotetext{Imagen tomada de \url{https://goo.gl/images/i7C70w}}
+\subsection{Lógica de negocio e interacción con la aplicación móvil}
+La interacción entre la aplicación móvil y el dispositivo se desarrolla en dos etapas principales: configuración inicial por Bluetooth y comunicación operativa vía HTTP.
 
-La figura y el epígrafe deben conformar una unidad cuyo significado principal pueda ser comprendido por el lector sin necesidad de leer el cuerpo central de la memoria. Para eso es necesario que el epígrafe sea todo lo detallado que corresponda y si en la figura se utilizan abreviaturas entonces aclarar su significado en el epígrafe o en la misma figura.
+\subsubsection{Fase de configuración}
+Al iniciar el sistema por primera vez o tras un reinicio de red, la aplicación móvil se conecta a la ESP32 mediante Bluetooth Low Energy (BLE). A través de esta conexión, el usuario ingresa las credenciales de su red Wi-Fi doméstica (SSID y contraseña), las cuales son transmitidas de forma segura al microcontrolador. Una vez recibidos estos datos, el dispositivo intenta conectarse a la red y, de ser exitoso, inicia el servidor embebido.
 
+\subsubsection{Fase operativa}
+Luego de establecer conexión WiFi, la ESP32 expone una API REST que permite a la aplicación móvil interactuar con el sistema. Entre las operaciones más importantes se incluyen:
 
+\begin{itemize}
+	\item Lectura de datos ambientales (temperatura, humedad, pH, EC, etc.).
+	\item Consulta del estado de los actuadores (iluminación, bomba, ventilación).
+	\item Configuración de parámetros personalizados y umbrales de alerta.
+	\item Activación manual o automática de funciones del sistema.
+	\item Acceso a registros de eventos o errores del sistema.
+\end{itemize}
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[scale=.37]{./Figures/questionMark.png}
-	\caption{¿Por qué de pronto aparece esta figura?}
-	\label{fig:questionMark}
-\end{figure}
+\subsubsection{Manejo de estados y sincronización}
+El firmware mantiene una estructura centralizada de datos en memoria que refleja el estado actual del sistema. Esta información se sincroniza con la app móvil cada vez que se establece una sesión HTTP válida. De este modo, el usuario siempre visualiza información actualizada del estado del cultivo.
 
-Nunca colocar una figura en el documento antes de hacer la primera referencia a ella, como se ilustra con la figura \ref{fig:questionMark}, porque sino el lector no comprenderá por qué de pronto aparece la figura en el documento, lo que distraerá su atención.
-
-Otra posibilidad es utilizar el entorno \textit{subfigure} para incluir más de una figura, como se puede ver en la figura \ref{fig:three graphs}. Notar que se pueden referenciar también las figuras internas individualmente de esta manera: \ref{fig:1de3}, \ref{fig:2de3} y \ref{fig:3de3}.
- 
-\begin{figure}[!htpb]
-     \centering
-     \begin{subfigure}[b]{0.3\textwidth}
-         \centering
-         \includegraphics[width=.65\textwidth]{./Figures/questionMark}
-         \caption{Un caption.}
-         \label{fig:1de3}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[b]{0.3\textwidth}
-         \centering
-         \includegraphics[width=.65\textwidth]{./Figures/questionMark}
-         \caption{Otro.}
-         \label{fig:2de3}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[b]{0.3\textwidth}
-         \centering
-         \includegraphics[width=.65\textwidth]{./Figures/questionMark}
-         \caption{Y otro más.}
-         \label{fig:3de3}
-     \end{subfigure}
-        \caption{Tres gráficos simples.}
-        \label{fig:three graphs}
-\end{figure}
-
-El código para generar las imágenes se encuentra disponible para su reutilización en el archivo \file{Chapter2.tex}.
-
-\subsection{Tablas}
-
-Para las tablas utilizar el mismo formato que para las figuras, sólo que el epígrafe se debe colocar arriba de la tabla, como se ilustra en la tabla \ref{tab:peces}. Observar que sólo algunas filas van con líneas visibles y notar el uso de las negritas para los encabezados.  La referencia se logra utilizando el comando \verb|\ref{<label>}| donde label debe estar definida dentro del entorno de la tabla.
-
-\begin{verbatim}
-\begin{table}[h]
-	\centering
-	\caption[caption corto]{caption largo más descriptivo}
-	\begin{tabular}{l c c}    
-		\toprule
-		\textbf{Especie}     & \textbf{Tamaño} & \textbf{Valor}\\
-		\midrule
-		Amphiprion Ocellaris & 10 cm           & \$ 6.000 \\		
-		Hepatus Blue Tang    & 15 cm           & \$ 7.000 \\
-		Zebrasoma Xanthurus  & 12 cm           & \$ 6.800 \\
-		\bottomrule
-		\hline
-	\end{tabular}
-	\label{tab:peces}
-\end{table}
-\end{verbatim}
-
-
-\begin{table}[h]
-	\centering
-	\caption[caption corto]{caption largo más descriptivo.}
-	\begin{tabular}{l c c}    
-		\toprule
-		\textbf{Especie} 	 & \textbf{Tamaño} 		& \textbf{Valor}  \\
-		\midrule
-		Amphiprion Ocellaris & 10 cm 				& \$ 6.000 \\		
-		Hepatus Blue Tang	 & 15 cm				& \$ 7.000 \\
-		Zebrasoma Xanthurus	 & 12 cm				& \$ 6.800 \\
-		\bottomrule
-		\hline
-	\end{tabular}
-	\label{tab:peces}
-\end{table}
-
-En cada capítulo se debe reiniciar el número de conteo de las figuras y las tablas, por ejemplo, figura 2.1 o tabla 2.1, pero no se debe reiniciar el conteo en cada sección. Por suerte la plantilla se encarga de esto por nosotros.
-
-\subsection{Ecuaciones}
-\label{sec:Ecuaciones}
-
-Al insertar ecuaciones en la memoria dentro de un entorno \textit{equation}, éstas se numeran en forma automática  y se pueden referir al igual que como se hace con las figuras y tablas, por ejemplo ver la ecuación \ref{eq:metric}.
-
-\begin{equation}
-	\label{eq:metric}
-	ds^2 = c^2 dt^2 \left( \frac{d\sigma^2}{1-k\sigma^2} + \sigma^2\left[ d\theta^2 + \sin^2\theta d\phi^2 \right] \right)
-\end{equation}
-                                                        
-Es importante tener presente que si bien las ecuaciones pueden ser referidas por su número, también es correcto utilizar los dos puntos, como por ejemplo ``la expresión matemática que describe este comportamiento es la siguiente:''
-
-\begin{equation}
-	\label{eq:schrodinger}
-	\frac{\hbar^2}{2m}\nabla^2\Psi + V(\mathbf{r})\Psi = -i\hbar \frac{\partial\Psi}{\partial t}
-\end{equation}
-
-Para generar la ecuación \ref{eq:metric} se utilizó el siguiente código:
-
-\begin{verbatim}
-\begin{equation}
-	\label{eq:metric}
-	ds^2 = c^2 dt^2 \left( \frac{d\sigma^2}{1-k\sigma^2} + 
-	\sigma^2\left[ d\theta^2 + 
-	\sin^2\theta d\phi^2 \right] \right)
-\end{equation}
-\end{verbatim}
-
-Y para la ecuación \ref{eq:schrodinger}:
-
-\begin{verbatim}
-\begin{equation}
-	\label{eq:schrodinger}
-	\frac{\hbar^2}{2m}\nabla^2\Psi + V(\mathbf{r})\Psi = 
-	-i\hbar \frac{\partial\Psi}{\partial t}
-\end{equation}
-
-\end{verbatim}
-
-\definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
-\definecolor{mymauve}{rgb}{0.58,0,0.82}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% parámetros para configurar el formato del código en los entornos lstlisting
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\lstset{ %
-  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
-  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
-  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
-  breaklines=true,                 % sets automatic line breaking
-  captionpos=b,                    % sets the caption-position to bottom
-  commentstyle=\color{mygreen},    % comment style
-  deletekeywords={...},            % if you want to delete keywords from the given language
-  %escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
-  %extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
-  %frame=single,	                % adds a frame around the code
-  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
-  keywordstyle=\color{blue},       % keyword style
-  language=[ANSI]C,                % the language of the code
-  %otherkeywords={*,...},           % if you want to add more keywords to the set
-  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
-  numbersep=5pt,                   % how far the line-numbers are from the code
-  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
-  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
-  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
-  showstringspaces=false,          % underline spaces within strings only
-  showtabs=false,                  % show tabs within strings adding particular underscores
-  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
-  stringstyle=\color{mymauve},     % string literal style
-  tabsize=2,	                   % sets default tabsize to 2 spaces
-  title=\lstname,                  % show the filename of files included with \lstinputlisting; also try caption instead of title
-  morecomment=[s]{/*}{*/}
-}
-
-
-%----------------------------------------------------------------------------------------
-%	SECTION 1
-%----------------------------------------------------------------------------------------
-\section{Análisis del software}
- 
-La idea de esta sección es resaltar los problemas encontrados, los criterios utilizados y la justificación de las decisiones que se hayan tomado.
-
-Se puede agregar código o pseudocódigo dentro de un entorno lstlisting con el siguiente código:
-
-\begin{verbatim}
-\begin{lstlisting}[caption= "un epígrafe descriptivo"]
-	las líneas de código irían aquí...
-\end{lstlisting}
-\end{verbatim}
-
-A modo de ejemplo:
-
-\begin{lstlisting}[label=cod:vControl,caption=Pseudocódigo del lazo principal de control.]  % Start your code-block
-
-#define MAX_SENSOR_NUMBER 3
-#define MAX_ALARM_NUMBER  6
-#define MAX_ACTUATOR_NUMBER 6
-
-uint32_t sensorValue[MAX_SENSOR_NUMBER];		
-FunctionalState alarmControl[MAX_ALARM_NUMBER];	//ENABLE or DISABLE
-state_t alarmState[MAX_ALARM_NUMBER];						//ON or OFF
-state_t actuatorState[MAX_ACTUATOR_NUMBER];			//ON or OFF
-
-void vControl() {
-
-	initGlobalVariables();
-	
-	period = 500 ms;
-		
-	while(1) {
-
-		ticks = xTaskGetTickCount();
-		
-		updateSensors();
-		
-		updateAlarms();
-		
-		controlActuators();
-		
-		vTaskDelayUntil(&ticks, period);
-	}
-}
-\end{lstlisting}
-
+Además, se contempló la posibilidad de incorporar una capa adicional de persistencia remota, como sincronización con bases de datos externas o servicios en la nube, lo que permitirá futuras extensiones del sistema hacia modelos más complejos de análisis de datos o inteligencia artificial.
 
 

@@ -21,17 +21,17 @@ La placa ESP32-DevKitC V4, figura \ref{fig:devkit}, es una placa de desarrollo b
 Cacterísticas generales:
 
 \begin{itemize}
-	\item Basada en diferentes módulos ESP32.
-	\item Microcontrolador con arquitectura de uno o dos núcleos de 32 bits (típicamente Tensilica LX6) con velocidades de reloj de hasta 240 MHz.
-	\item Memoria SRAM integrada (con opciones de PSRAM externa en algunos módulos como los WROVER).
-	\item Memoria flash integrada para almacenamiento de firmware.
+	%\item Basada en diferentes módulos ESP32.
+	\item Microcontrolador con arquitectura de uno o dos núcleos de 32 bits con velocidades de reloj de hasta 240 MHz.
+	\item Memoria SRAM integrada.
+	%\item Memoria flash integrada para almacenamiento de firmware.
 	\item Conectividad Wi-Fi 802.11 b/g/n (2.4 GHz) integrada.
 	\item Conectividad bluetooth (classic y low energy) integrada.
-	\item La mayoría de los pines I/O del módulo ESP32 están disponibles a través de pines header para una fácil conexión.
-	\item Permite la conexión de periféricos con cables jumper o el montaje en una placa de pruebas.
-	\item Conector micro USB para alimentación y comunicación.
-	\item Botones de reset y boot integrados para facilitar la programación.
-	\item Compatible con múltiples entornos de desarrollo (ESP-IDF, Arduino IDE, MicroPython).
+	%\item La mayoría de los pines I/O del módulo ESP32 están disponibles a través de pines header para una fácil conexión.
+	%\item Permite la conexión de periféricos con cables jumper o el montaje en una placa de pruebas.
+	%\item Conector micro USB para alimentación y comunicación.
+	%\item Botones de reset y boot integrados para facilitar la programación.
+	%\item Compatible con múltiples entornos de desarrollo (ESP-IDF, Arduino IDE, MicroPython).
 \end{itemize}
 
 \begin{figure}[h]
@@ -51,14 +51,14 @@ El sensor de pH analógico PH-4502C, figura \ref{fig:ph}, es un módulo electró
 Características:
 
 \begin{itemize}
-	\item Módulo electrónico compatible con electrodos de pH con conector BNC.
+	%\item Módulo electrónico compatible con electrodos de pH con conector BNC.
 	\item Rango de detección de pH de 0 a 14.
 	\item Salida analógica que varía, entre 0 y 5 VDC, con el pH del liquido.
-	\item Requiere una alimentación de voltaje de 5V DC.
-	\item Corriente de operación entre 5 y 10 mA.
+	%\item Requiere una alimentación de voltaje de 5V DC.
+	%\item Corriente de operación entre 5 y 10 mA.
 	\item Temperatura de operación del módulo generalmente entre -10 °C y 50 °C.
-	\item Incorpora un potenciómetro para el ajuste del offset o calibración.
-	\item El electrodo tiene un tiempo de estabilización de respuesta de aproximadamente 1 minuto.
+	%\item Incorpora un potenciómetro para el ajuste del offset o calibración.
+	%\item El electrodo tiene un tiempo de estabilización de respuesta de aproximadamente 1 minuto.
 \end{itemize}
 
 \begin{figure}[h]
@@ -74,20 +74,20 @@ Características:
 
 %https://uelectronics.com/producto/sensor-de-ph-liquido/?srsltid=AfmBOop9186NUUqLe2lmdM_tZTSfz79gsdcGSMFpg6aQvBxj-Fu9oF5t
 
-\subsection{Módulo medidos de solidos disueltos totales}
+\subsection{Módulo medidor de solidos disueltos totales}
 
 El medidor de sólidos disueltos totales o TDS (del inglés \textit{Total Dissolved Solids}) Meter 1.0, figura \ref{fig:tds}, es un sensor o módulo electrónico diseñado para medir la cantidad total de sustancias orgánicas e inorgánicas disueltas en un líquido, expresada típicamente en partes por millón (ppm) o miligramos por litro (mg/l) \cite{TDS}. Este tipo de sensor se utiliza para evaluar la calidad del agua en diversas aplicaciones como hidroponía, acuicultura, tratamiento de aguas y monitoreo ambiental.
 
 Características:
 
 \begin{itemize}
-	\item Requiere alimentación de 3.3 a 5.5 VDC.
-	\item Salida analógica de 0 a 2.3 VDC (proporcional a TDS).
+	%\item Requiere alimentación de 3.3 a 5.5 VDC.
+	\item Salida analógica de 0 a 2,3 VDC (proporcional a TDS).
 	\item Rango de medición típico de 0 a 1000 ppm.
-	\item Incluye sonda impermeable con electrodos.
+	%\item Incluye sonda impermeable con electrodos.
 	\item Interfaz de 3 pines (VCC, GND, output).
 	\item Conector para la sonda (2 pines).
-	\item Compensación de temperatura.
+	%\item Compensación de temperatura.
 \end{itemize}
 
 
@@ -104,13 +104,13 @@ Características:
 
 \subsection{Sensor de humedad capacitivo V2.0}
 
-El sensor de humedad capacitivo V2.0, figura \ref{fig:moisture}, mide los niveles de humedad del medio mediante detección capacitiva en lugar de resistiva, como otros sensores disponibles. Fabricado con material resistente a la corrosión, ofrece una vida útil prolongada al insertarse en el sustrato alrededor de las plantas \cite{MOISTURE}.
+El sensor de humedad capacitivo V2.0, figura \ref{fig:moisture}, mide los niveles de humedad mediante detección capacitiva en lugar de resistiva, como otros sensores disponibles. Fabricado con material resistente a la corrosión, ofrece una vida útil prolongada al insertarse en el sustrato alrededor de las plantas \cite{MOISTURE}.
 
 \begin{itemize}
-	\item Requiere alimentación de 3.3 a 5.5 VDC.
+	\item Requiere alimentación de 3,3 a 5,5 VDC.
 	\item Corriente de operación de 5 mA.
 	\item Salida analógica.
-	\item Incluye un regulador de tensión integrado compatible con MCUs de 3.3V y 5V.
+	%\item Incluye un regulador de tensión integrado compatible con MCUs de 3.3V y 5V.
 \end{itemize}
 
 
@@ -126,20 +126,20 @@ El sensor de humedad capacitivo V2.0, figura \ref{fig:moisture}, mide los nivele
 
 \subsection{Sensor de temperatura digital DS18B20}
 
-El DS18B20, figura \ref{fig:ds18b20}, es un sensor de temperatura digital que proporciona mediciones en grados celsius con una resolución configurable de 9 a 12 bits \cite{DS18B20}. Este sensor se comunica a través de un bus 1-Wire, lo que significa que solo requiere una línea de datos (además de tierra) para la comunicación con un micontrolador. Cada DS18B20 tiene un código de serie único de 64 bits grabado en fábrica, lo que permite que múltiples sensores funcionen en el mismo bus 1-Wire, lo que permite la creación de redes de sensores de temperatura distribuidos.
+El DS18B20, figura \ref{fig:ds18b20}, es un sensor de temperatura digital que proporciona mediciones en grados celsius con una resolución configurable de 9 a 12 bits \cite{DS18B20}. %Este sensor se comunica a través de un bus 1-Wire, lo que significa que solo requiere una línea de datos (además de tierra) para la comunicación con un micontrolador. Cada DS18B20 tiene un código de serie único de 64 bits grabado en fábrica, lo que permite que múltiples sensores funcionen en el mismo bus 1-Wire, lo que permite la creación de redes de sensores de temperatura distribuidos.
 
 Características:
 
 \begin{itemize}
-	\item Requiere alimentación de 3.3 a 5.5 VDC.
-	\item Rango de medición de temperatura: -55 °C a +125 °C (-67 °F a +257 °F).
-	\item Precisión: ±0.5 °C en el rango de -10 °C a +85 °C.
-	\item Resolución configurable: 9, 10, 11 o 12 bits (por defecto 12 bits).
+	%\item Requiere alimentación de 3.3 a 5.5 VDC.
+	\item Rango de medición de temperatura: -55 °C a +125 °C.
+	\item Precisión: ±0,5 °C en el rango de -10 °C a +85 °C.
+	%\item Resolución configurable: 9, 10, 11 o 12 bits (por defecto 12 bits).
 	\item Interfaz de comunicación: 1-Wire (requiere un solo pin digital).
-	\item Cada sensor tiene una dirección única de 64 bits.
-	\item Puede alimentarse a través de la línea de datos (\textit{parasite power}) o con una fuente externa.
-	\item Tiempo de conversión de temperatura: hasta 750 ms (para resolución de 12 bits).
-	\item Disponible en encapsulado TO-92 y en versiones con sonda impermeable.
+	%\item Cada sensor tiene una dirección única de 64 bits.
+	%\item Puede alimentarse a través de la línea de datos (\textit{parasite power}) o con una fuente externa.
+	%\item Tiempo de conversión de temperatura: hasta 750 ms (para resolución de 12 bits).
+	%\item Disponible en encapsulado TO-92 y en versiones con sonda impermeable.
 \end{itemize}
 
 
@@ -157,12 +157,12 @@ Características:
 
 \subsection{Sensor de luz ambiental digital BH1750}
 
-El circuito integrado BH1750, figura \ref{fig:BH1750}, es un sensor de luz ambiental digital con interfaz de bus I2C (\textit{Inter-Integrated Circuit}) \cite{BH1750}. Este sensor es capaz de detectar un amplio rango de intensidad luminosa con alta resolución, desde 1 hasta 65535 lux. El chip proporciona una salida digital directa, eliminando la necesidad de cálculos complejos.
+El circuito integrado BH1750, figura \ref{fig:BH1750}, es un sensor de luz ambiental digital con interfaz de bus I2C (\textit{Inter-Integrated Circuit}) \cite{BH1750}. Este sensor es capaz de detectar un amplio rango de intensidad luminosa con alta resolución, desde 1 hasta 65535 lux. El chip proporciona una salida digital directa, lo que elimina la necesidad de cálculos complejos.
 
 Características:
 
 \begin{itemize}
-	\item Requiere alimentación de 3.3 a 5.5 VDC.
+	%\item Requiere alimentación de 3.3 a 5.5 VDC.
 	\item Interfaz de comunicación I2C.
 	\item Rango de medición de 1 a 65535 lux.
 	\item Resolución: 16 bits.
@@ -197,23 +197,23 @@ FreeRTOS es un sistema operativo en tiempo real (RTOS) popular y de código abie
 
 \subsection{Ceedling}
 
-Ceedling es un framework de construcción y prueba para proyectos de software embebido en C. Automatiza tareas como la compilación, el enlazado y la ejecución de pruebas unitarias. Integra herramientas como Unity (para escribir pruebas), CMock (para crear objetos simulados) y Ruby (como lenguaje de automatización). Facilita la adopción de prácticas de desarrollo basadas en pruebas (TDD) y asegura la calidad del código mediante la verificación automatizada de unidades de software individuales. Proporciona una estructura organizada para la gestión de pruebas y la generación de informes \cite{CEEDLING}.
+Ceedling es un framework de construcción y prueba para proyectos de software embebido en C. Automatiza tareas como la compilación, el enlazado y la ejecución de pruebas unitarias. Integra herramientas como Unity, CMock y Ruby. Facilita la adopción de prácticas de desarrollo basadas en pruebas (TDD) y asegura la calidad del código mediante la verificación automatizada de unidades de software individuales \cite{CEEDLING}.
 
 \subsection{React Native}
-React Native es un framework de código abierto desarrollado por Meta. Permite la creación de aplicaciones móviles para plataformas iOS y Android desde una única base de código JavaScript. Utiliza los mismos bloques de construcción de la interfaz de usuario que las aplicaciones nativas. Esto resulta en aplicaciones con apariencia y rendimiento nativos. Una gran comunidad y un amplio ecosistema de bibliotecas lo respaldan \cite{reactnative}.
+React Native es un framework de código abierto desarrollado por Meta. Permite la creación de aplicaciones móviles para plataformas iOS y Android desde una única base de código JavaScript. Utiliza los mismos bloques de construcción de la interfaz de usuario que las aplicaciones nativas. Esto resulta en aplicaciones con apariencia y rendimiento nativos \cite{reactnative}.
 
 \section{Protocolos de comunicación empleados}
 
-A continuación de detallan los protocolos de comunicación empleados en la realización del trabajo.
+A continuación, se detallan los protocolos de comunicación empleados en la realización del trabajo.
 
 \subsection{HTTP}
-HTTP (\textit{Hypertext Transfer Protocol}) es un protocolo de aplicación fundamental para la red de internet mundial. Define cómo los clientes (navegadores web) solicitan recursos (páginas web, imágenes, etc.) a los servidores y cómo estos responden. Utiliza un modelo de petición-respuesta. Las peticiones HTTP incluyen un método (GET, POST, PUT, DELETE, etc.) que indica la acción que el cliente desea realizar. Las respuestas HTTP contienen un código de estado que informa sobre el resultado de la petición. HTTP es un protocolo sin estado, lo que significa que cada petición es independiente de las anteriores \cite{HTTP}.
+HTTP (\textit{Hypertext Transfer Protocol}) es un protocolo de aplicación que define cómo los clientes (navegadores web) solicitan recursos (páginas web, imágenes, etc.) a los servidores y cómo estos responden. Utiliza un modelo de petición-respuesta. Las peticiones HTTP incluyen un método (GET, POST, PUT, DELETE, etc.) que indica la acción que el cliente desea realizar. Las respuestas HTTP contienen un código de estado que informa sobre el resultado de la petición \cite{HTTP}.
 
 \subsection{I2C}
-I2C (Inter-Integrated Circuit) es un protocolo de comunicación serial síncrono, multi-maestro/esclavo, de baja velocidad y corta distancia. Utiliza solo dos líneas bidireccionales: SDA (datos seriales) y SCL (reloj serial), ambas conectadas a través de resistencias pull-up. Permite que múltiples dispositivos (maestros y esclavos) se comuniquen entre sí en el mismo bus. Cada dispositivo es direccionable por un identificador único de 7 o 10 bits. Los maestros inician la comunicación y controlan el reloj, mientras que los esclavos responden a las peticiones de los maestros. Es ampliamente utilizado para conectar microcontroladores con periféricos de baja velocidad como sensores, EEPROMs y pantallas \cite{I2C}.
+I2C (Inter-Integrated Circuit) es un protocolo de comunicación serial síncrono, multi-maestro/esclavo, de baja velocidad y corta distancia. Utiliza solo dos líneas bidireccionales: SDA (datos seriales) y SCL (reloj serial), ambas conectadas a través de resistencias pull-up. Permite que múltiples dispositivos se comuniquen entre sí en el mismo bus. Los maestros inician la comunicación y controlan el reloj, mientras que los esclavos responden a las peticiones de los maestros \cite{I2C}.
 
 \subsection{1-Wire}
-1-Wire es un protocolo de comunicación serial semidúplex diseñado por Dallas Semiconductor (ahora Analog Devices). Utiliza un único conductor para la comunicación de datos y, en algunos casos, para la alimentación. Un maestro controla la comunicación con uno o varios dispositivos esclavos en el mismo bus. Cada dispositivo es identificado por un código único de 64 bits grabado en fábrica. El protocolo es relativamente lento pero resulta económico para conectar sensores, memorias y otros dispositivos de baja velocidad, especialmente en aplicaciones donde el bajo número de pines es limitado. Permite la alimentación de los dispositivos esclavos a través de la línea de datos \cite{1WIRE}.
+1-Wire es un protocolo de comunicación serial semidúplex. Utiliza un único conductor para la comunicación de datos y, en algunos casos, para la alimentación. Un maestro controla la comunicación con uno o varios dispositivos esclavos en el mismo bus. El protocolo es relativamente lento pero resulta económico para conectar sensores, memorias y otros dispositivos de baja velocidad, especialmente en aplicaciones donde el bajo número de pines es limitado \cite{1WIRE}.
 
 
 
