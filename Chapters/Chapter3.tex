@@ -2,7 +2,7 @@
 
 \label{Chapter3} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
-En este capítulo se abordará la descripción de la arquitectura general del sistema, arquitectura del software, modulos componentes del software, desarrollo del software, diseño del hardware, selección y calibración de sensores y desarrollo de la aplicación movil.
+En este capítulo se abordará la descripción de la arquitectura general del sistema, la arquitectura del software, los módulos componentes del software, el desarrollo del software, el diseño del hardware, la selección y la calibración de sensores y el desarrollo de la aplicación movil.
 \section{Diagrama de bloques}
 En la figura \ref{fig:d_bloques} se muestra el diagrama en bloques general del sistema donde se describe la arquitectura aplicada al trabajo.
 
@@ -13,7 +13,7 @@ En la figura \ref{fig:d_bloques} se muestra el diagrama en bloques general del s
 	\label{fig:d_bloques}
 \end{figure}
 
-El sistema embebido implementado en este trabajo consta de una PCB centralizadora, diseñada para integrar y gestionar todos los módulos de hardware. Esta arquitectura asegura la alimentación, adaptación y protección de todos sus componentes. El sistema completo abarca desde la adquisición de datos mediante sensores hasta las acciones sobre el entorno a través de actuadores, y se complementa con una interfaz de usuario móvil para el monitoreo y control remoto.
+El sistema embebido implementado en este trabajo consta de una PCB centralizadora, diseñada para integrar y gestionar todos los módulos de hardware. Esta arquitectura asegura la alimentación, adaptación y protección de todos sus componentes. El sistema completo abarca desde la adquisición de datos mediante sensores hasta las acciones sobre el entorno a través de actuadores. Además, se complementa con una interfaz de usuario móvil para el monitoreo y control remoto.
 
 A continuación, se describen brevemente los bloques y su función.
 
@@ -34,12 +34,12 @@ En la presente sección se aborda la arquitectura del firmware del microcontrola
 
 \subsection{Patrones}
 
-Patrones de diseño arquitectónico utilizados.
+A continuación, se detallan los patrones de diseño arquitectónico utilizados.
 
 \subsubsection{Arquitectura en capas}
-Se adoptó un patrón de arquitectura en capas para estructurar el software desarrollado, esto permitió una separación de funcionalidades clara mediante niveles de abstracción. Dicha metodología divide el sistema en niveles horizontales, cada uno con responsabilidades específicas y bien definidas, lo que facilita el desarrollo, la mantenibilidad y la escalabilidad del código.
+Se adoptó un patrón de arquitectura en capas para estructurar el software desarrollado, lo que permitió una separación de funcionalidades clara mediante niveles de abstracción. Dicha metodología divide el sistema en niveles horizontales, cada uno con responsabilidades específicas y bien definidas, que facilita el desarrollo, la mantenibilidad y la escalabilidad del código.
 
-A continuación, las capas de abstracción que constituyen el firmware.
+A continuación, se enumeran las capas de abstracción que constituyen el firmware.
 
 \begin{itemize}
 	\item Capa de aplicación.
@@ -56,17 +56,10 @@ Para facilitar la interacción con los diversos componentes de hardware y garant
 
 El patrón de control ambiental se adoptó como estrategia arquitectónica para la capa de aplicación. El sistema embebido requirió la monitorización y modificación del entorno mediante sensores y actuadores. Este patrón permitió la estructuración de la lógica de control y facilitó la gestión de las interacciones entre los componentes de hardware y la implementación de los algoritmos de control.
 
-\begin{figure}[h]
-\centering
-\includegraphics[scale=.4]{./Figures/arq_bloques.png}
-	\caption{Diagrama de módulos funcionales y sus interacciones.}
-	\label{fig:arq_bloques}
-\end{figure}
-
 
 \subsection{Componentes}
 
-La capa de aplicación, figura \ref{fig:arq_bloques}, esta constituida por los componentes de software encargados de gestionar cada una de las funcionalidades del sistema.
+La capa de aplicación, figura \ref{fig:arq_bloques}, está constituida por los componentes de software encargados de gestionar cada una de las funcionalidades del sistema.
 A continuación, se describe brevemente la funcionalidad de cada uno de estos componentes.
 
 \begin{itemize}
@@ -77,18 +70,29 @@ A continuación, se describe brevemente la funcionalidad de cada uno de estos co
 	\item Monitor de humedad del sustrato: mide el contenido de humedad en el sustrato del cultivo.
 	\item Monitor de luz: mide la cantidad de luz disponible en el entorno a través de un sensor.
 	\item Servidor web embebido: el servidor web embebido permite la comunicación con el sistema de control del cultivo a través de la red. Este servidor permite monitorear, configurar y controlar el sistema desde cualquier dispositivo con acceso a la red.
-	\item Control de ciclo de luz: el control de ciclo de luz administra el encendido y apagado de las luces. Según los parámetros de crecimiento de las plantas configurados, ajusta la duración para optimizar la fotosíntesis y el desarrollo de las plantas.
-	\item Control de ciclo de oxigenación / ventilación: este componente activa y desactiva el flujo de aire en el sistema de cultivo según la configuración del usuario.
-	\item Este sistema gestiona el riego, activa bombas de agua y ajusta los niveles de humedad del sustrato según las mediciones del sensor de humedad. Esto asegura la cantidad adecuada de agua para el desarrollo de las plantas.
+	\item Control de ciclo de luz: este módulo se encarga de gestionar el ciclo de iluminación del cultivo. La configuración de dicho ciclo se realiza por medio de la interfaz de usuario.
+	\item Control de ciclo de oxigenación/ventilación: este componente activa y desactiva el flujo de aire en el sistema de cultivo según la configuración del usuario.
+	\item Control de hidratación: gestiona el riego, activa la bomba de agua y ajusta los niveles de humedad del sustrato según las mediciones del sensor de humedad. Esto asegura la cantidad adecuada de agua para el desarrollo de las plantas.
 	\item Administrador: es el componente encargado de la centralización y validación global de los datos suministrados por los demás módulos de software.
 \end{itemize}
+
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=.4]{./Figures/arq_bloques.png}
+	\caption{Diagrama de módulos funcionales y sus interacciones.}
+	\label{fig:arq_bloques}
+\end{figure}
+
+
 
 \section{Desarrollo del software}
 
 Para facilitar la escalabilidad de la aplicación, se implementó una tarea de FreeRTOS para cada componente del firmware. Esta arquitectura modular permite modificar cada componente de forma independiente, sin afectar al resto del sistema.
 
 \subsection{Gestión de la comunicación entre tareas}
-La comunicación entre tareas se gestiona mediante un patrón de publicación/suscripción, con múltiples canales, utilizando colas de FreeRTOS como buffers para el intercambio de datos. Esta arquitectura desacopla los productores de información (ej., monitores) de los consumidores (ej., controlador, administrador), lo que garantiza la integridad de los datos y la estabilidad del sistema al evitar condiciones de carrera.
+La comunicación entre tareas se gestiona mediante un patrón de publicación/suscripción con múltiples canales, que utiliza colas de FreeRTOS como buffers para el intercambio de datos. Esta arquitectura desacopla los productores de información (ej., monitores) de los consumidores (ej., controlador, administrador), lo que garantiza la integridad de los datos y la estabilidad del sistema al evitar condiciones de carrera.
 
 \subsection{Gestión de la prioridad}
 Durante el desarrollo del firmware, se abordó la organización de las tareas considerando el clásico problema de productores-consumidores. Esta estrategia permitió estructurar el sistema en función del flujo de información entre tareas.
@@ -99,9 +103,9 @@ Se implementaron los controladores como tareas consumidoras, cuya función es to
 
 Se desarrolló una tarea de administrador, también consumidora, responsable de coordinar el funcionamiento general del sistema y gestionar configuraciones.
 
-El servidor embebido fue programado con un doble rol: responde a eventos generados por el usuario (como solicitudes de información o configuraciones), y también produce eventos que otras tareas consumen, como actualizaciones de parámetros.
+El servidor embebido fue programado con un doble rol: responde a eventos generados por el usuario (como solicitudes de información o configuraciones) y también produce eventos que otras tareas consumen, como actualizaciones de parámetros.
 
-Se asignaron diferentes niveles de prioridad a las tareas según su disponibilidad requerida. Las tareas de monitoreo se crearon con prioridad intermedia, mientras que las tareas de control y administración se configuraron con mayor prioridad para asegurar tiempos de respuesta adecuados ante eventos prioritarios. El servidor, al depender de la interacción del usuario, fue asignado prioridad alta.
+Se asignaron diferentes niveles de prioridad a las tareas según su disponibilidad requerida. Las tareas de monitoreo se crearon con prioridad intermedia, mientras que las tareas de control y administración se configuraron con mayor prioridad para asegurar tiempos de respuesta adecuados ante eventos prioritarios. El servidor, al depender de la interacción del usuario, fue asignado con prioridad alta.
 
 \subsection{Controladores de dispositivos}
 
@@ -109,19 +113,19 @@ Se desarrollaron controladores de dispositivos (\textit{device drivers}) dedicad
 
 Estos controladores permiten abstraer las operaciones de bajo nivel necesarias para interactuar con sensores y actuadores.
 
-\subsection{Gestion de fallos}
+\subsection{Gestión de fallos}
 El sistema incorpora mecanismos de detección y manejo de fallos tanto a nivel de hardware como de software. Cada tarea cuenta con rutinas de supervisión que permiten identificar comportamientos anómalos o pérdida de respuesta de los dispositivos. En caso de error, se activan procedimientos de contingencia que buscan restablecer el funcionamiento sin comprometer la estabilidad del sistema general.
 
 Por ejemplo, si un sensor deja de enviar datos válidos durante un tiempo determinado, se genera una alerta que es registrada y comunicada al usuario. De igual modo, si un actuador no responde a una orden tras múltiples intentos, se desactiva su uso y se notifica al sistema mediante una bandera de estado.
 
-Además, se implementó un mecanismo de watchdog que reinicia automáticamente el microcontrolador en caso de bloqueo o error crítico no recuperable. La configuración base del usuario se almacena en memoria no volátil (NVS), lo cual permite que el sistema se recupere de cortes de energía sin perder los parámetros definidos.
+Además, se implementó un mecanismo de \textit{watchdog} que reinicia automáticamente el microcontrolador en caso de bloqueo o error crítico no recuperable. La configuración base del usuario se almacena en memoria no volátil (NVS), lo que permite que el sistema se recupere de cortes de energía sin perder los parámetros definidos.
 
 \subsection{Servidor embebido}
-Para facilitar la interacción con el usuario, el sistema cuenta con un servidor embebido basado en HTTP, alojado en la propia ESP32. Este servidor permite exponer una API REST, a través de la cual se puede monitorear el estado del cultivo, consultar los valores de los sensores en tiempo real y ejecutar acciones como el encendido manual de actuadores o la configuración de alertas.
+Para facilitar la interacción con el usuario, el sistema cuenta con un servidor embebido basado en HTTP alojado en la propia ESP32. Este servidor permite exponer una API REST, a través de la cual se puede monitorear el estado del cultivo, consultar los valores de los sensores en tiempo real y ejecutar acciones como el encendido manual de actuadores o la configuración de alertas.
 
-El servidor opera de forma concurrente con el resto de las tareas del sistema, gracias a la arquitectura multitarea de FreeRTOS. Para garantizar la seguridad de acceso, se implementó un sistema básico de autenticación por usuario y contraseña, que protege las rutas de la API.
+El servidor opera de forma concurrente con el resto de las tareas del sistema gracias a la arquitectura multitarea de FreeRTOS. Para garantizar la seguridad de acceso, se implementó un sistema básico de autenticación por usuario y contraseña que protege las rutas de la API.
 
-El servidor responde a peticiones HTTP provenientes tanto de navegadores como de la aplicación móvil desarrollada en React Native, la cual primero transmite las credenciales de red por Bluetooth para iniciar la conexión WiFi y luego se comunica mediante la API expuesta.
+El servidor responde a peticiones HTTP provenientes tanto de navegadores como de la aplicación móvil desarrollada en React Native, que primero transmite las credenciales de red por Bluetooth para iniciar la conexión Wi-Fi y luego se comunica mediante la API expuesta.
 
 Este servidor embebido representa un componente clave para el monitoreo remoto y la escalabilidad del sistema, ya que permite una integración sencilla con otras plataformas IoT o bases de datos externas si se desea en el futuro.
 
@@ -129,10 +133,10 @@ Este servidor embebido representa un componente clave para el monitoreo remoto y
 La interacción entre la aplicación móvil y el dispositivo se desarrolla en dos etapas principales: configuración inicial por Bluetooth y comunicación operativa vía HTTP.
 
 \subsubsection{Fase de configuración}
-Al iniciar el sistema por primera vez o tras un reinicio de red, la aplicación móvil se conecta a la ESP32 mediante Bluetooth Low Energy (BLE). A través de esta conexión, el usuario ingresa las credenciales de su red Wi-Fi doméstica (SSID y contraseña), las cuales son transmitidas de forma segura al microcontrolador. Una vez recibidos estos datos, el dispositivo intenta conectarse a la red y, de ser exitoso, inicia el servidor embebido.
+Al iniciar el sistema por primera vez o tras un reinicio de red, la aplicación móvil se conecta a la ESP32 mediante \textit{Bluetooth Low Energy} (BLE). A través de esta conexión, el usuario ingresa las credenciales de su red Wi-Fi doméstica (SSID y contraseña), que son transmitidas de forma segura al microcontrolador. Una vez recibidos estos datos, el dispositivo intenta conectarse a la red y, de ser exitoso, inicia el servidor embebido.
 
 \subsubsection{Fase operativa}
-Luego de establecer conexión WiFi, la ESP32 expone una API REST que permite a la aplicación móvil interactuar con el sistema. Entre las operaciones más importantes se incluyen:
+Luego de establecer conexión Wi-Fi, la ESP32 expone una API REST que permite a la aplicación móvil interactuar con el sistema. Entre las operaciones más importantes se incluyen:
 
 \begin{itemize}
 	\item Lectura de datos ambientales (temperatura, humedad, pH, EC, etc.).
