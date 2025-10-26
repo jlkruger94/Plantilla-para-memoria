@@ -3,6 +3,7 @@
 \label{Chapter3} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
 
 En este capítulo se abordará la descripción de la arquitectura general del sistema, la arquitectura del software, los módulos componentes del software, el desarrollo del software, el diseño del hardware, la selección y la calibración de sensores y el desarrollo de la aplicación movil.
+
 \section{Diagrama de bloques}
 En la figura \ref{fig:d_bloques} se muestra el diagrama en bloques general del sistema donde se describe la arquitectura aplicada al trabajo.
 
@@ -89,135 +90,101 @@ A continuación, se describe brevemente la funcionalidad de cada uno de estos co
 
 \section{Desarrollo del software}
 
-Para facilitar la escalabilidad de la aplicación, se implementó una tarea de FreeRTOS para cada componente del firmware. Esta arquitectura modular permite modificar cada componente de forma independiente, sin afectar al resto del sistema.
+Para facilitar la escalabilidad de la aplicación, se implementó una tarea de FreeRTOS para cada componente del firmware. Esta arquitectura modular permite modificar cada elemento de forma independiente, sin afectar al resto del sistema.
 
 \subsection{Gestión de la comunicación entre tareas}
-La comunicación entre tareas se gestiona mediante un patrón de publicación/suscripción con múltiples canales, que utiliza colas de FreeRTOS como buffers para el intercambio de datos. Esta arquitectura desacopla los productores de información (ej., monitores) de los consumidores (ej., controlador, administrador), lo que garantiza la integridad de los datos y la estabilidad del sistema al evitar condiciones de carrera.
+La comunicación entre tareas se gestiona mediante un patrón de publicación/suscripción con múltiples canales, que utiliza colas como buffers para el intercambio de datos. Esta arquitectura desacopla los productores de información (monitores) de los consumidores (controladores y administrador), lo que garantiza la integridad de los datos y la estabilidad del sistema al evitar condiciones de carrera.
 
-\subsection{Gestión de la prioridad}
-Durante el desarrollo del firmware, se abordó la organización de las tareas considerando el clásico problema de productores-consumidores. Esta estrategia permitió estructurar el sistema en función del flujo de información entre tareas.
+\subsection{Gestión de prioridades}
+Se asignaron diferentes niveles de prioridad a las tareas según su criticidad. Las de monitoreo se configuraron con prioridad intermedia, mientras que las de control y administración recibieron mayor prioridad para asegurar tiempos de respuesta adecuados. El servidor, al depender de la interacción del usuario, fue asignado con prioridad alta.
 
-Se definieron los monitores como tareas productoras, encargadas de obtener datos del entorno mediante sensores y publicarlos en estructuras compartidas .
-
-Se implementaron los controladores como tareas consumidoras, cuya función es tomar decisiones en base a los datos recibidos y accionar los actuadores correspondientes.
-
-Se desarrolló una tarea de administrador, también consumidora, responsable de coordinar el funcionamiento general del sistema y gestionar configuraciones.
-
-El servidor embebido fue programado con un doble rol: responde a eventos generados por el usuario (como solicitudes de información o configuraciones) y también produce eventos que otras tareas consumen, como actualizaciones de parámetros.
-
-Se asignaron diferentes niveles de prioridad a las tareas según su disponibilidad requerida. Las tareas de monitoreo se crearon con prioridad intermedia, mientras que las tareas de control y administración se configuraron con mayor prioridad para asegurar tiempos de respuesta adecuados ante eventos prioritarios. El servidor, al depender de la interacción del usuario, fue asignado con prioridad alta.
+Los monitores funcionan como tareas productoras que obtienen datos del entorno mediante sensores y los publican en estructuras compartidas. Los controladores actúan como tareas consumidoras que toman decisiones basadas en estos datos y accionan los actuadores correspondientes. La tarea de administrador, también consumidora, coordina el funcionamiento general del sistema y gestiona configuraciones.
 
 \subsection{Controladores de dispositivos}
-
-Se desarrollaron controladores de dispositivos (\textit{device drivers}) dedicados a gestionar directamente las unidades de hardware involucradas en el sistema.
-
-Estos controladores permiten abstraer las operaciones de bajo nivel necesarias para interactuar con sensores y actuadores.
+Se desarrollaron controladores de dispositivos (\textit{device drivers}) dedicados a gestionar directamente las unidades de hardware, mediante la abstracción de las operaciones de bajo nivel necesarias para interactuar con sensores y actuadores.
 
 \subsection{Gestión de fallos}
-El sistema incorpora mecanismos de detección y manejo de fallos tanto a nivel de hardware como de software. Cada tarea cuenta con rutinas de supervisión que permiten identificar comportamientos anómalos o pérdida de respuesta de los dispositivos. En caso de error, se activan procedimientos de contingencia que buscan restablecer el funcionamiento sin comprometer la estabilidad del sistema general.
+El sistema incorpora mecanismos de detección y manejo de fallos a nivel de hardware y software. Cada tarea cuenta con rutinas de supervisión que identifican comportamientos anómalos o pérdida de respuesta de los dispositivos.
 
-Por ejemplo, si un sensor deja de enviar datos válidos durante un tiempo determinado, se genera una alerta que es registrada y comunicada al usuario. De igual modo, si un actuador no responde a una orden tras múltiples intentos, se desactiva su uso y se notifica al sistema mediante una bandera de estado.
+En caso de error, se activan procedimientos de contingencia que buscan restablecer el funcionamiento sin alterar la estabilidad general. Por ejemplo, si un sensor deja de enviar datos válidos durante un tiempo determinado, se genera una alerta que es registrada y comunicada al usuario. Si un actuador no responde tras múltiples intentos, se desactiva su uso y se notifica mediante una bandera de estado.
 
-Además, se implementó un mecanismo de \textit{watchdog} que reinicia automáticamente el microcontrolador en caso de bloqueo o error crítico no recuperable. La configuración base del usuario se almacena en memoria no volátil (NVS), lo que permite que el sistema se recupere de cortes de energía sin perder los parámetros definidos.
+Además, se implementó un mecanismo de \textit{watchdog} que reinicia automáticamente el microcontrolador en caso de bloqueo o error crítico no recuperable. La configuración del usuario se almacena en memoria no volátil (NVS) por medio de un sistema de archivos, lo que permite la recuperación de parámetros tras cortes de energía.
 
-\subsection{Servidor embebido}
-Para facilitar la interacción con el usuario, el sistema cuenta con un servidor embebido basado en HTTP alojado en la propia ESP32. Este servidor permite exponer una API REST, a través de la cual se puede monitorear el estado del cultivo, consultar los valores de los sensores en tiempo real y ejecutar acciones como el encendido manual de actuadores o la configuración del dispositivo.
+\subsection{Servidor embebido y API REST}
+El sistema cuenta con un servidor embebido HTTP alojado en la ESP32 que expone una API REST para la interacción con el usuario. Esta permite el monitoreo del estado del cultivo, la consulta de valores de sensores en tiempo real, y la ejecución de acciones como el encendido manual de actuadores o la configuración del dispositivo.
 
-El servidor opera de forma concurrente con el resto de las tareas del sistema gracias a la arquitectura multitarea de FreeRTOS. Para garantizar la seguridad de acceso, se implementó un sistema básico de autenticación por usuario y contraseña que protege las rutas de la API.
+El servidor opera concurrentemente con el resto de las tareas gracias a la arquitectura multitarea de FreeRTOS, y cuenta con un sistema básico de autenticación por usuario y contraseña.
 
-El servidor embebido atiende peticiones HTTP provenientes tanto de navegadores como de la \textit{aplicación Progressive Web Application} (PWA), desarrollada en React, que se comunica a través de la API expuesta.
+La API REST atiende peticiones HTTP desde navegadores y la aplicación \textit{Progressive Web Application} (PWA) desarrollada en React, que se distribuye mediante un servidor Docker desplegado en una Raspberry Pi 4 Model B.
 
-Este componente constituye una parte fundamental del sistema, ya que posibilita el monitoreo remoto y favorece la escalabilidad, lo que permite además una integración más sencilla con futuras plataformas IoT o bases de datos externas.
-
-La PWA se distribuye mediante un servidor implementado en un contenedor Docker, desplegado sobre una Raspberry Pi 4 Model B.
-
-%\subsubsection{API REST}
-
-\subsection{Lógica de negocio e interacción con la aplicación móvil}
-Al encender el sistema por primera vez, se configura automáticamente el acceso a la red del usuario mediante el protocolo \textit{Wi-Fi Protected Setup} (WPS). El equipo espera el evento de activación de WPS generado al presionar el botón correspondiente del router. Una vez obtenidas las credenciales, se almacenan localmente para su uso en futuros reinicios de red. Luego, el sistema intenta conectarse a la red. Si la conexión es exitosa, se inicia el servidor embebido y se habilita la interacción con la aplicación móvil a través de la interfaz gráfica. En caso de fallo en la conexión, se reinicia automáticamente el proceso de configuración.
-
-
-\subsubsection{Fase operativa}
-Luego de establecer conexión Wi-Fi, la ESP32 expone una API REST que permite a la aplicación móvil interactuar con el sistema. Entre las operaciones más importantes se incluyen:
-
+Las operaciones principales incluyen:
 \begin{itemize}
-	\item Lectura de datos ambientales (temperatura, humedad, pH, EC, etc.).
-	\item Consulta del estado de los actuadores (iluminación, bomba, ventilación).
-	\item Configuración de parámetros personalizados y umbrales de alerta.
-	\item Activación manual o automática de funciones del sistema.
-	\item Acceso a registros de eventos o errores del sistema.
+    \item Lectura de datos ambientales (temperatura, humedad, pH, EC).
+    \item Consulta del estado de actuadores (iluminación, bomba, ventilación).
+    \item Configuración de parámetros y umbrales de alerta.
+    \item Activación manual o automática de funciones del sistema.
+    \item Acceso a registros de eventos y errores.
 \end{itemize}
 
-\subsubsection{Manejo de estados de actuadores y sincronización de sensores}
-El firmware mantiene una estructura centralizada de datos en memoria que refleja el estado actual del sistema. Esta información se sincroniza con la app móvil cada vez que se establece una sesión HTTP válida. De este modo, el usuario siempre visualiza información actualizada del estado del cultivo.
+El firmware mantiene una estructura centralizada de datos que se sincroniza con la aplicación móvil a través de sesiones HTTP válidas, asegurando que el usuario visualice información actualizada del cultivo.
 
-Además, se contempló la posibilidad de incorporar una capa adicional de persistencia remota, como sincronización con bases de datos externas o servicios en la nube, lo que permitirá futuras extensiones del sistema hacia modelos más complejos de análisis de datos o inteligencia artificial.
+\subsection{Lógica de negocio}
+Al encender el sistema por primera vez, se configura automáticamente el acceso Wi-Fi mediante el protocolo \textit{Wi-Fi Protected Setup} (WPS). El dispositivo espera la activación del botón WPS del router para obtener las credenciales, que se almacenan localmente para futuros reinicios. Si la conexión falla, el proceso se reinicia automáticamente.
+
+Una vez establecida la conexión, se inicia el servidor embebido y se habilita la interacción con la aplicación móvil.
 
 \subsection{Estructura del código}
-La arquitectura del sistema sigue el patrón modular descrito anteriormente, con diferentes módulos de software que ejecutan tareas de forma ordenada y en un flujo claramente definido. Cada tarea se crea e inicializa siguiendo un orden específico.
-
-El ciclo de ejecución comienza en el archivo principal \texttt{main.c}, donde se inicializa el núcleo del sistema a través del componente \texttt{Administrator}.
+La arquitectura sigue el patrón modular con módulos de software que ejecutan tareas de forma ordenada. El ciclo comienza en \texttt{main.c} con la inicialización del sistema a través del componente \texttt{Administrator}, como se detalla en la figura \ref{fig:flujo:sistema}.
 
 \subsubsection*{Inicialización del sistema}
-Al encender el dispositivo, la función \texttt{app\_main()} en \texttt{main.c} crea la tarea principal \texttt{administrator\_callback} con alta prioridad. Esta tarea actúa como coordinador general al gestionar la interacción entre todos los módulos y subsistemas.
+La función \texttt{app\_main()} crea la tarea \texttt{administrator\_callback} con alta prioridad, que actúa como un coordinador general que gestiona la interacción entre módulos y subsistemas.
 
-Durante la fase de inicialización, el \texttt{Administrator} establece los componentes fundamentales: configura el pool de memoria para optimizar los recursos, inicializa el sistema de archivos para la persistencia de datos, establece la conectividad Wi-Fi e inicia el servidor web que provee la interfaz de usuario.
+Durante la inicialización, el \texttt{Administrator} configura el pool de memoria, inicializa el sistema de archivos, establece la conectividad Wi-Fi e inicia el servidor web.
 
 \subsubsection*{Configuración de hora y alarmas}
-El sistema incorpora un módulo \textit{Real Time Clock} (RTC) que garantiza la precisión temporal incluso durante interrupciones de energía. Además, inicializa un sistema de alarmas con distintos niveles de severidad (críticos, de advertencia e informativos) y persiste los mensajes de alerta en un archivo para evitar perdida de información tras un reinicio.
+El sistema incorpora un módulo \textit{Real Time Clock} (RTC) que garantiza precisión temporal durante interrupciones de energía. Además, inicializa un sistema de alarmas con niveles de severidad variables y persiste los mensajes en archivo para evitar pérdida de información tras reinicios.
 
 \subsubsection*{Creación de monitores de sensores}
-Posteriormente, se crean seis tareas independientes de monitoreo, cada una dedicada a un sensor específico del sistema hidropónico, cuyo acceso es gestionado por medio del \textit{device driver} correspondiente:
+Se crean seis tareas independientes de monitoreo para sensores específicos del sistema hidropónico, gestionadas por sus respectivos \textit{device drivers}:
 
 \begin{itemize}
-    \item \texttt{temperature\_monitor}: muestrea periodicamente la temperatura a través del sensor DS18B20.
-    \item \texttt{moisture\_monitor}: mide la húmedad del sustrato a través del sensor capacitivo v2.0.
-    \item \texttt{light\_monitor}: muestrea periodicamente la iluminancia por medio del sensor BH1750.
-    \item \texttt{solution\_level\_monitor}: toma la entrada correspondiente al sensor de nivel.
-    \item \texttt{pH\_monitor}: muestrea la magnitud de pH de la solución a través del módulo de adaptación PH-4502C.
-    \item \texttt{EC\_monitor}: mide la conductividad eléctrica y con ello la concentración de nutrientes de la solución.
+    \item \texttt{temperature\_monitor}: muestrea la temperatura (DS18B20).
+    \item \texttt{moisture\_monitor}: mide la humedad del sustrato (sensor capacitivo v2.0).
+    \item \texttt{light\_monitor}: muestrea la iluminancia (BH1750).
+    \item \texttt{solution\_level\_monitor}: sensor de nivel de solución.
+    \item \texttt{pH\_monitor}: mide pH (módulo PH-4502C).
+    \item \texttt{EC\_monitor}: mide conductividad eléctrica y concentración de nutrientes.
 \end{itemize}
 
-Cada monitor funciona como una tarea independiente de \textit{FreeRTOS}, con su propio stack y nivel de prioridad. Las tareas realizan lecturas de sensores cada segundo y publican los datos en el sistema de comunicación central.
+Cada monitor es una tarea independiente que realiza lecturas cada segundo y publica datos hacia el administrador.
 
 \subsubsection*{Inicialización de controladores de actuadores}
-De manera paralela, se crean tres controladores encargados de gestionar los dispositivos de actuación:
+Paralelamente, se crean tres controladores como tareas independientes:
 
 \begin{itemize}
-    \item \texttt{moisture\_controller}: administra el sistema de riego automático, ya sea por nivel o por intervalo.
-    \item \texttt{light\_controller}: controla el encendido y apagado de las luces según el ciclo diurno. Esto permite que el módulo se coloque en interiores lejos de la luz solar directa.
-    \item \texttt{fan\_controller}: regula la ventilación y circulación del aire.
+    \item \texttt{moisture\_controller}: administra riego automático por nivel o intervalo.
+    \item \texttt{light\_controller}: controla luces según ciclo diurno para interiores.
+    \item \texttt{fan\_controller}: regula ventilación y circulación de aire.
 \end{itemize}
 
-Estos controladores operan como tareas independientes que esperan órdenes del sistema para activar o desactivar los dispositivos correspondientes.
+Estos controladores operan de forma autónoma según la configuración establecida previamente por el usuario, y también pueden recibir órdenes del sistema para activar o desactivar dispositivos.
 
-\subsubsection*{Sistema de comunicación \textit{Pub/Sub}}
-El sistema de comunicación se basa en un mecanismo de \textit{publish/subscribe}, que permite la interacción desacoplada entre los componentes. Los sensores publican sus mediciones en tópicos específicos, mientras que los controladores se suscriben a los comandos de actuación. El \texttt{Administrator} supervisa y gestiona el flujo completo de información.
+\subsubsection*{Mecanismo de comunicación Pub/Sub}
+El sistema utiliza un mecanismo de \textit{publish/subscribe} que permite interacción desacoplada entre componentes. Los sensores publican mediciones en tópicos específicos, mientras los controladores se suscriben a comandos de actuación. El \texttt{Administrator} supervisa el flujo completo de información.
 
 \subsubsection*{Bucle principal de control}
-Una vez completada la inicialización, el \texttt{Administrator} ejecuta un bucle principal con un periodo de un segundo. En cada iteración:
+Una vez inicializado, el \texttt{Administrator} ejecuta un bucle principal de un segundo que realiza las funciones detalladas en la figura \ref{fig:flujo:sistema}:
 
 \begin{itemize}
-    \item Lee los datos publicados por los sensores.
-    \item Evalúa las condiciones de alarma comparando los valores actuales con los umbrales configurados.
-    \item Actualiza la API REST con información en tiempo real para la interfaz web.
-    \item Procesa las modificaciones de configuración realizadas por el usuario desde la aplicación.
-\end{itemize}
-
-\subsubsection*{Interfaz web y control remoto}
-El servidor web expone una API REST completa que permite al usuario:
-
-\begin{itemize}
-    \item Monitorear en tiempo real todos los parámetros del cultivo.
-    \item Ajustar umbrales y configuraciones del sistema.
-    \item Controlar manualmente los actuadores cuando sea necesario.
-    \item Recibir notificaciones de alarmas y alertas del sistema.
+    \item Lee datos publicados por sensores.
+    \item Evalúa condiciones de alarma mediante comparación con umbrales configurados.
+    \item Actualiza la API REST con información en tiempo real.
+    \item Procesa modificaciones de configuración del usuario.
 \end{itemize}
 
 \subsubsection*{Arquitectura de tareas paralelas}
-El diseño se basa en una arquitectura de tareas paralelas que permite a los sensores y controladores operar de forma independiente bajo la supervisión del \texttt{Administrator}. Esta estructura evita cuellos de botella y asegura una respuesta rápida ante los cambios del sistema. Como resultado, el programa es completamente modular, robusto y facilmente escalable.
+El diseño basado en tareas paralelas permite a sensores y controladores operar independientemente bajo supervisión del \texttt{Administrator}, como se ilustra en la figura \ref{fig:flujo:sistema}. Esta estructura evita cuellos de botella y asegura respuesta rápida, lo que resulta en un programa robusto, escalable y mantenible.
 
-%FLujo-sistema
 \begin{figure}[h]
 \centering
 \includegraphics[scale=.4]{./Figures/FLujo-sistema.png}
@@ -245,7 +212,7 @@ A continuación, en la figura \ref{fig:config} se puede observar un diagrama de 
 
 \section{Desarrollo del hardware}
 
-Esta sección describe el proceso de diseño, implementación y validación del hardware del sistema \textit{HydroGrow}. Se detallan las etapas de planificación del circuito, selección de componentes, integración de módulos y pruebas de funcionamiento realizadas sobre el prototipo final.
+Esta sección describe el proceso completo de diseño, implementación y validación del hardware del sistema \textit{HydroGrow}. Se abordan las etapas de planificación del circuito basado en ESP32, selección de componentes específicos como sensores DS18B20, capacitivos v2.0, BH1750, módulos PH-4502C y conductividad eléctrica, integración de actuadores controlados por MOSFETs y relevadores de estado sólido, diseño de PCB con herramientas CAD, y pruebas exhaustivas de funcionalidad realizadas sobre el prototipo final.
 
 \subsection{Arquitectura general del sistema}
 % Describir el enfoque global del hardware: módulos, interconexiones y función de cada bloque.
@@ -397,5 +364,3 @@ Estas optimizaciones minimizan el tiempo de carga y mejoran la experiencia del u
 % Describir autenticación de usuarios, cifrado, etc.
 Para garantizar la seguridad de las comunicaciones, la API REST implementa un mecanismo de autenticación por token y el intercambio de datos se cifra mediante HTTPS.  
 Además, se incorporaron restricciones de acceso por rol para prevenir modificaciones no autorizadas en la configuración del sistema.
-
-
