@@ -121,19 +121,21 @@ Por ejemplo, si un sensor deja de enviar datos válidos durante un tiempo determ
 Además, se implementó un mecanismo de \textit{watchdog} que reinicia automáticamente el microcontrolador en caso de bloqueo o error crítico no recuperable. La configuración base del usuario se almacena en memoria no volátil (NVS), lo que permite que el sistema se recupere de cortes de energía sin perder los parámetros definidos.
 
 \subsection{Servidor embebido}
-Para facilitar la interacción con el usuario, el sistema cuenta con un servidor embebido basado en HTTP alojado en la propia ESP32. Este servidor permite exponer una API REST, a través de la cual se puede monitorear el estado del cultivo, consultar los valores de los sensores en tiempo real y ejecutar acciones como el encendido manual de actuadores o la configuración de alertas.
+Para facilitar la interacción con el usuario, el sistema cuenta con un servidor embebido basado en HTTP alojado en la propia ESP32. Este servidor permite exponer una API REST, a través de la cual se puede monitorear el estado del cultivo, consultar los valores de los sensores en tiempo real y ejecutar acciones como el encendido manual de actuadores o la configuración del dispositivo.
 
 El servidor opera de forma concurrente con el resto de las tareas del sistema gracias a la arquitectura multitarea de FreeRTOS. Para garantizar la seguridad de acceso, se implementó un sistema básico de autenticación por usuario y contraseña que protege las rutas de la API.
 
-El servidor responde a peticiones HTTP provenientes tanto de navegadores como de la aplicación móvil desarrollada en React Native, que primero transmite las credenciales de red por Bluetooth para iniciar la conexión Wi-Fi y luego se comunica mediante la API expuesta.
+El servidor embebido atiende peticiones HTTP provenientes tanto de navegadores como de la \textit{aplicación Progressive Web Application} (PWA), desarrollada en React, que se comunica a través de la API expuesta.
 
-Este servidor embebido representa un componente clave para el monitoreo remoto y la escalabilidad del sistema, ya que permite una integración sencilla con otras plataformas IoT o bases de datos externas si se desea en el futuro.
+Este componente constituye una parte fundamental del sistema, ya que posibilita el monitoreo remoto y favorece la escalabilidad, lo que permite además una integración más sencilla con futuras plataformas IoT o bases de datos externas.
+
+La PWA se distribuye mediante un servidor implementado en un contenedor Docker, desplegado sobre una Raspberry Pi 4 Model B.
+
+%\subsubsection{API REST}
 
 \subsection{Lógica de negocio e interacción con la aplicación móvil}
-La interacción entre la aplicación móvil y el dispositivo se desarrolla en dos etapas principales: configuración inicial por Bluetooth y comunicación operativa vía HTTP.
+Al encender el sistema por primera vez, se configura automáticamente el acceso a la red del usuario mediante el protocolo \textit{Wi-Fi Protected Setup} (WPS). El equipo espera el evento de activación de WPS generado al presionar el botón correspondiente del router. Una vez obtenidas las credenciales, se almacenan localmente para su uso en futuros reinicios de red. Luego, el sistema intenta conectarse a la red. Si la conexión es exitosa, se inicia el servidor embebido y se habilita la interacción con la aplicación móvil a través de la interfaz gráfica. En caso de fallo en la conexión, se reinicia automáticamente el proceso de configuración.
 
-\subsubsection{Fase de configuración}
-Al iniciar el sistema por primera vez o tras un reinicio de red, la aplicación móvil se conecta a la ESP32 mediante \textit{Bluetooth Low Energy} (BLE). A través de esta conexión, el usuario ingresa las credenciales de su red Wi-Fi doméstica (SSID y contraseña), que son transmitidas de forma segura al microcontrolador. Una vez recibidos estos datos, el dispositivo intenta conectarse a la red y, de ser exitoso, inicia el servidor embebido.
 
 \subsubsection{Fase operativa}
 Luego de establecer conexión Wi-Fi, la ESP32 expone una API REST que permite a la aplicación móvil interactuar con el sistema. Entre las operaciones más importantes se incluyen:
@@ -146,9 +148,254 @@ Luego de establecer conexión Wi-Fi, la ESP32 expone una API REST que permite a 
 	\item Acceso a registros de eventos o errores del sistema.
 \end{itemize}
 
-\subsubsection{Manejo de estados y sincronización}
+\subsubsection{Manejo de estados de actuadores y sincronización de sensores}
 El firmware mantiene una estructura centralizada de datos en memoria que refleja el estado actual del sistema. Esta información se sincroniza con la app móvil cada vez que se establece una sesión HTTP válida. De este modo, el usuario siempre visualiza información actualizada del estado del cultivo.
 
 Además, se contempló la posibilidad de incorporar una capa adicional de persistencia remota, como sincronización con bases de datos externas o servicios en la nube, lo que permitirá futuras extensiones del sistema hacia modelos más complejos de análisis de datos o inteligencia artificial.
+
+\subsection{Estructura del código}
+La arquitectura del sistema sigue el patrón modular descrito anteriormente, con diferentes módulos de software que ejecutan tareas de forma ordenada y en un flujo claramente definido. Cada tarea se crea e inicializa siguiendo un orden específico.
+
+El ciclo de ejecución comienza en el archivo principal \texttt{main.c}, donde se inicializa el núcleo del sistema a través del componente \texttt{Administrator}.
+
+\subsubsection*{Inicialización del sistema}
+Al encender el dispositivo, la función \texttt{app\_main()} en \texttt{main.c} crea la tarea principal \texttt{administrator\_callback} con alta prioridad. Esta tarea actúa como coordinador general al gestionar la interacción entre todos los módulos y subsistemas.
+
+Durante la fase de inicialización, el \texttt{Administrator} establece los componentes fundamentales: configura el pool de memoria para optimizar los recursos, inicializa el sistema de archivos para la persistencia de datos, establece la conectividad Wi-Fi e inicia el servidor web que provee la interfaz de usuario.
+
+\subsubsection*{Configuración de hora y alarmas}
+El sistema incorpora un módulo \textit{Real Time Clock} (RTC) que garantiza la precisión temporal incluso durante interrupciones de energía. Además, inicializa un sistema de alarmas con distintos niveles de severidad (críticos, de advertencia e informativos) y persiste los mensajes de alerta en un archivo para evitar perdida de información tras un reinicio.
+
+\subsubsection*{Creación de monitores de sensores}
+Posteriormente, se crean seis tareas independientes de monitoreo, cada una dedicada a un sensor específico del sistema hidropónico, cuyo acceso es gestionado por medio del \textit{device driver} correspondiente:
+
+\begin{itemize}
+    \item \texttt{temperature\_monitor}: muestrea periodicamente la temperatura a través del sensor DS18B20.
+    \item \texttt{moisture\_monitor}: mide la húmedad del sustrato a través del sensor capacitivo v2.0.
+    \item \texttt{light\_monitor}: muestrea periodicamente la iluminancia por medio del sensor BH1750.
+    \item \texttt{solution\_level\_monitor}: toma la entrada correspondiente al sensor de nivel.
+    \item \texttt{pH\_monitor}: muestrea la magnitud de pH de la solución a través del módulo de adaptación PH-4502C.
+    \item \texttt{EC\_monitor}: mide la conductividad eléctrica y con ello la concentración de nutrientes de la solución.
+\end{itemize}
+
+Cada monitor funciona como una tarea independiente de \textit{FreeRTOS}, con su propio stack y nivel de prioridad. Las tareas realizan lecturas de sensores cada segundo y publican los datos en el sistema de comunicación central.
+
+\subsubsection*{Inicialización de controladores de actuadores}
+De manera paralela, se crean tres controladores encargados de gestionar los dispositivos de actuación:
+
+\begin{itemize}
+    \item \texttt{moisture\_controller}: administra el sistema de riego automático, ya sea por nivel o por intervalo.
+    \item \texttt{light\_controller}: controla el encendido y apagado de las luces según el ciclo diurno. Esto permite que el módulo se coloque en interiores lejos de la luz solar directa.
+    \item \texttt{fan\_controller}: regula la ventilación y circulación del aire.
+\end{itemize}
+
+Estos controladores operan como tareas independientes que esperan órdenes del sistema para activar o desactivar los dispositivos correspondientes.
+
+\subsubsection*{Sistema de comunicación \textit{Pub/Sub}}
+El sistema de comunicación se basa en un mecanismo de \textit{publish/subscribe}, que permite la interacción desacoplada entre los componentes. Los sensores publican sus mediciones en tópicos específicos, mientras que los controladores se suscriben a los comandos de actuación. El \texttt{Administrator} supervisa y gestiona el flujo completo de información.
+
+\subsubsection*{Bucle principal de control}
+Una vez completada la inicialización, el \texttt{Administrator} ejecuta un bucle principal con un periodo de un segundo. En cada iteración:
+
+\begin{itemize}
+    \item Lee los datos publicados por los sensores.
+    \item Evalúa las condiciones de alarma comparando los valores actuales con los umbrales configurados.
+    \item Actualiza la API REST con información en tiempo real para la interfaz web.
+    \item Procesa las modificaciones de configuración realizadas por el usuario desde la aplicación.
+\end{itemize}
+
+\subsubsection*{Interfaz web y control remoto}
+El servidor web expone una API REST completa que permite al usuario:
+
+\begin{itemize}
+    \item Monitorear en tiempo real todos los parámetros del cultivo.
+    \item Ajustar umbrales y configuraciones del sistema.
+    \item Controlar manualmente los actuadores cuando sea necesario.
+    \item Recibir notificaciones de alarmas y alertas del sistema.
+\end{itemize}
+
+\subsubsection*{Arquitectura de tareas paralelas}
+El diseño se basa en una arquitectura de tareas paralelas que permite a los sensores y controladores operar de forma independiente bajo la supervisión del \texttt{Administrator}. Esta estructura evita cuellos de botella y asegura una respuesta rápida ante los cambios del sistema. Como resultado, el programa es completamente modular, robusto y facilmente escalable.
+
+%FLujo-sistema
+\begin{figure}[h]
+\centering
+\includegraphics[scale=.4]{./Figures/FLujo-sistema.png}
+	\caption{Diagrama simplificado del ciclo de ejecución del programa.}
+	\label{fig:flujo:sistema}
+\end{figure}
+
+
+\subsection{Gestion de la configuración}
+Al iniciar, el sistema crea un archivo \texttt{config.json} en la memoria flash. Este archivo se genera con valores por defecto, ya que el usuario aún no ha configurado el dispositivo. Para su creación y almacenamiento se utilizan las bibliotecas \texttt{json\_static.h} y \texttt{fs.h}, respectivamente. Simultáneamente, se inicializa en memoria RAM la estructura \texttt{g\_current\_config}, que mantiene la configuración durante toda la ejecución del programa. Esta estructura solo se actualiza mediante la interacción del usuario a través de la API REST, al utilizar el endpoint \texttt{/config} con el método POST.
+
+Cuando se recibe una nueva configuración, se actualiza la variable global definida en \texttt{hydro\_rest.c}. Inmediatamente, se envía un mensaje a través del tópico \texttt{u\_config} con un indicador que especifica qué módulo fue actualizado. Esto permite al administrador actualizar \texttt{config.json} y propagar la configuración al controlador correspondiente.
+
+A continuación, en la figura \ref{fig:config} se puede observar un diagrama de flujo simplificado de la propagación de la configuración.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=.4]{./Figures/config.png}
+	\caption{Propagación de la configuración.}
+	\label{fig:config}
+\end{figure}
+
+
+%======================================================================
+
+\section{Desarrollo del hardware}
+
+Esta sección describe el proceso de diseño, implementación y validación del hardware del sistema \textit{HydroGrow}. Se detallan las etapas de planificación del circuito, selección de componentes, integración de módulos y pruebas de funcionamiento realizadas sobre el prototipo final.
+
+\subsection{Arquitectura general del sistema}
+% Describir el enfoque global del hardware: módulos, interconexiones y función de cada bloque.
+El sistema está conformado por módulos independientes que trabajan de manera coordinada. Entre ellos se incluyen el módulo de control principal, los sensores, los actuadores y los circuitos de alimentación.  
+La Figura~\ref{fig:arquitectura_hardware} muestra el diagrama general de interconexión del hardware.
+
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=0.95\textwidth]{figuras/arquitectura_hardware.png}
+%    \caption{Arquitectura general del hardware del sistema \textit{HydroGrow}.}
+%    \label{fig:arquitectura_hardware}
+%\end{figure}
+
+\subsection{Diseño electrónico}
+% Explicar cómo se diseñaron las placas, esquemas, y conexiones eléctricas.
+El diseño electrónico se realizó en base a una arquitectura modular. Cada subsistema se desarrolló con su propio esquema eléctrico para facilitar el mantenimiento y la escalabilidad.  
+Se emplearon herramientas de diseño asistido por computadora (CAD) como \textit{KiCad} o \textit{Altium Designer} para la creación de los circuitos impresos (PCB).
+
+\subsubsection*{Módulo de control principal}
+% Describir el microcontrolador, sus interfaces y funciones.
+El núcleo del sistema está basado en el microcontrolador \texttt{ESP32}, que proporciona conectividad Wi-Fi, múltiples interfaces de comunicación (UART, I2C, SPI) y suficiente capacidad de procesamiento para la ejecución de tareas en tiempo real.
+
+\subsubsection*{Sensores}
+% Describir tipos, rangos y conexión de sensores.
+El sistema integra sensores de temperatura, humedad, pH, conductividad eléctrica y nivel de solución nutritiva. Cada sensor se conecta mediante buses digitales o entradas analógicas, según corresponda.  
+Las señales analógicas son acondicionadas mediante circuitos de adaptación de nivel y filtrado para mejorar la precisión de lectura.
+
+\subsubsection*{Actuadores}
+% Describir bombas, luces, ventiladores, etc.
+Los actuadores incluyen bombas de agua, luces de crecimiento y ventiladores. Su control se realiza mediante transistores MOSFET y relevadores de estado sólido, que garantizan una conmutación eficiente y segura.
+
+\subsection{Sistema de alimentación}
+% Explicar fuentes, reguladores y protecciones eléctricas.
+El sistema cuenta con una fuente de alimentación conmutada de 12\,V, de la cual se derivan los niveles de 5\,V y 3.3\,V mediante reguladores lineales y DC-DC.  
+Se incorporaron fusibles de protección, diodos de polaridad inversa y condensadores de desacoplo para garantizar la estabilidad del sistema.
+
+\subsection{Diseño del PCB y ensamblaje}
+% Describir el proceso de diseño, fabricación y ensamblaje del circuito.
+El diseño del PCB prioriza la separación de señales de potencia y control, reduciendo interferencias electromagnéticas.  
+Las pistas críticas fueron dimensionadas de acuerdo con las corrientes máximas esperadas. El ensamblaje se realizó de manera manual utilizando componentes montados en superficie (SMD) y de orificio pasante (TH).
+
+\subsection{Pruebas y validación}
+% Describir pruebas de continuidad, consumo, funcionamiento de sensores, etc.
+Se realizaron pruebas eléctricas de continuidad y verificación de polaridades antes de alimentar el circuito.  
+Posteriormente, se llevaron a cabo pruebas funcionales para validar el correcto funcionamiento de los sensores, actuadores y módulos de comunicación.  
+Los resultados confirmaron la estabilidad del sistema bajo condiciones normales de operación.
+
+\subsection{Consideraciones de seguridad y mantenimiento}
+% Explicar protecciones, aislamiento, mantenimiento preventivo, etc.
+El diseño incluye aislamiento galvánico en las líneas de control de los actuadores, protecciones contra sobrecorriente y sobretemperatura, y puntos de fácil acceso para mantenimiento.  
+Estas medidas aumentan la vida útil del sistema y reducen el riesgo de fallos eléctricos.
+
+
+%======================================================================
+
+\section{Selección y calibración de sensores}
+
+Esta sección describe los criterios de selección y el proceso de calibración de los sensores utilizados en el sistema \textit{HydroGrow}. El objetivo es garantizar mediciones precisas y confiables de las variables críticas del entorno hidropónico.
+
+\subsection{Selección de sensores}
+% Explicar criterios de selección: precisión, rango, costo, disponibilidad, comunicación, etc.
+La selección de los sensores se realizó considerando precisión, estabilidad, compatibilidad eléctrica y facilidad de integración con el microcontrolador \texttt{ESP32}.  
+Los sensores elegidos fueron:
+
+\begin{itemize}
+    \item \textbf{Temperatura:} Sensor digital DS18B20, con rango de medición de $-55$\,°C a $+125$\,°C y resolución de 12 bits.
+    \item \textbf{Humedad del sustrato:} Sensor capacitivo analógico, resistente a la corrosión y con respuesta lineal en el rango de 0–100\,\%.
+    \item \textbf{pH:} Sonda analógica con amplificador de alta impedancia, calibrable mediante buffer estándar de pH 4, 7 y 10.
+    \item \textbf{Conductividad eléctrica (EC):} Sensor tipo electrodo doble, compatible con soluciones nutritivas de 0.1 a 20\,mS/cm.
+    \item \textbf{Nivel de solución:} Sensor ultrasónico con salida analógica, no intrusivo y resistente al ambiente húmedo.
+    \item \textbf{Luminosidad:} Sensor digital BH1750, con rango de 1 a 65\,535\,lx, conectado por bus I2C.
+\end{itemize}
+
+\subsection{Calibración de sensores}
+% Describir procedimientos generales o específicos de calibración.
+Cada sensor fue sometido a un proceso de calibración inicial para asegurar lecturas precisas:
+
+\begin{itemize}
+    \item Los sensores de pH y EC se calibraron con soluciones patrón de referencia, registrando los valores de compensación en el archivo \texttt{config.json}.
+    \item Los sensores de temperatura y humedad se verificaron frente a instrumentos certificados, aplicando correcciones lineales cuando fue necesario.
+    \item El sensor de luminosidad se ajustó mediante comparación con un luxómetro de laboratorio.
+    \item El sensor de nivel se calibró mediante mediciones en puntos de referencia físicos (mínimo, medio y máximo).
+\end{itemize}
+
+Las constantes de calibración se almacenan en memoria flash y se cargan durante el arranque del sistema. Esto permite conservar los ajustes incluso después de un reinicio y garantiza la coherencia en las mediciones a lo largo del tiempo.
+
+%======================================================================
+\section{Interfaz gráfica}
+
+Esta sección describe el diseño, estructura y funcionamiento de la interfaz gráfica del sistema \textit{HydroGrow}. El objetivo principal de la interfaz es proporcionar al usuario una visualización clara y en tiempo real de los parámetros del cultivo, además de ofrecer herramientas intuitivas para el control y la configuración del sistema.
+
+\subsection{Arquitectura del sistema de interfaz}
+% Describir la estructura general de la interfaz (cliente-servidor, arquitectura REST, etc.)
+La interfaz se basa en una arquitectura cliente-servidor. El servidor web embebido en el \texttt{ESP32} expone una API REST que permite la comunicación entre el hardware y la aplicación móvil o el navegador web del usuario.  
+El cliente se implementa como una aplicación web ligera desarrollada en \textit{HTML5}, \textit{CSS3} y \textit{JavaScript}, optimizada para dispositivos móviles y de escritorio.
+
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=0.95\textwidth]{figuras/arquitectura_interfaz.png}
+%    \caption{Arquitectura general de la interfaz gráfica del sistema \textit{HydroGrow}.}
+%    \label{fig:arquitectura_interfaz}
+%\end{figure}
+
+\subsection{Diseño de la interfaz de usuario}
+% Describir la disposición visual, estilo, principios de diseño y usabilidad.
+El diseño se desarrolló siguiendo los principios de usabilidad y consistencia visual. Se empleó un esquema de colores contrastantes que facilita la lectura de valores críticos y una disposición modular basada en tarjetas o paneles.  
+Cada sección agrupa información relacionada, lo que simplifica la navegación y permite una rápida identificación de los estados del sistema.
+
+\subsubsection*{Panel de monitoreo}
+% Explicar qué muestra y cómo se actualiza.
+El panel principal presenta en tiempo real los valores de los sensores de temperatura, humedad, pH, conductividad eléctrica y nivel de solución.  
+Las mediciones se actualizan mediante peticiones periódicas a la API REST, lo que garantiza una visualización fluida sin recargar la página.
+
+\subsubsection*{Panel de control}
+% Describir cómo el usuario controla actuadores o configuraciones.
+En esta sección, el usuario puede activar o desactivar manualmente los actuadores (bomba de riego, iluminación, ventilación) y ajustar parámetros de operación.  
+Las acciones se transmiten al servidor mediante solicitudes \texttt{POST} a los endpoints definidos en el módulo de control.
+
+\subsubsection*{Panel de configuración}
+% Explicar cómo se gestionan los parámetros del sistema.
+El panel de configuración permite modificar umbrales de alarma, intervalos de muestreo y credenciales de red.  
+Una vez confirmados los cambios, el sistema actualiza el archivo \texttt{config.json} en memoria flash y propaga los nuevos valores a los controladores correspondientes.
+
+\subsection{Comunicación con la API REST}
+% Explicar endpoints y métodos principales.
+La comunicación entre la interfaz y el sistema embebido se realiza a través de una API REST que sigue una estructura estandarizada.  
+Los principales endpoints son:
+
+\begin{itemize}
+    \item \texttt{GET /status}: obtiene los valores actuales de sensores y estado del sistema.
+    \item \texttt{POST /config}: actualiza la configuración general.
+    \item \texttt{POST /control}: envía comandos directos a los actuadores.
+    \item \texttt{GET /alarms}: consulta el registro de alarmas activas o históricas.
+\end{itemize}
+
+Cada solicitud y respuesta se maneja en formato \texttt{JSON}, lo que facilita la integración con otras plataformas o aplicaciones externas.
+
+\subsection{Pruebas de usabilidad}
+% Describir ensayos con usuarios, tiempos de respuesta, navegabilidad, etc.
+Se realizaron pruebas de usabilidad con un grupo de usuarios para evaluar la claridad de la información y la facilidad de navegación.  
+Los resultados demostraron que la estructura modular reduce el tiempo de acceso a la información y permite la configuración completa del sistema sin requerir conocimientos técnicos avanzados.
+
+\subsection{Compatibilidad y optimización}
+% Mencionar compatibilidad con dispositivos y rendimiento.
+La interfaz es completamente responsiva y se adapta a diferentes tamaños de pantalla. Se optimizó el rendimiento mediante la reducción de recursos estáticos, compresión \texttt{gzip} y almacenamiento en caché de datos locales.  
+Estas optimizaciones minimizan el tiempo de carga y mejoran la experiencia del usuario incluso en conexiones inalámbricas inestables.
+
+\subsection{Seguridad y autenticación}
+% Describir autenticación de usuarios, cifrado, etc.
+Para garantizar la seguridad de las comunicaciones, la API REST implementa un mecanismo de autenticación por token y el intercambio de datos se cifra mediante HTTPS.  
+Además, se incorporaron restricciones de acceso por rol para prevenir modificaciones no autorizadas en la configuración del sistema.
 
 
