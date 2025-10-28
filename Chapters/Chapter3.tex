@@ -101,7 +101,7 @@ Se asignaron diferentes niveles de prioridad a las tareas según su criticidad. 
 Los monitores funcionan como tareas productoras que obtienen datos del entorno mediante sensores y los publican en estructuras compartidas. Los controladores actúan como tareas consumidoras que toman decisiones basadas en estos datos y accionan los actuadores correspondientes. La tarea de administrador, también consumidora, coordina el funcionamiento general del sistema y gestiona configuraciones.
 
 \subsection{Controladores de dispositivos}
-Se desarrollaron controladores de dispositivos (\textit{device drivers}) dedicados a gestionar directamente las unidades de hardware, mediante la abstracción de las operaciones de bajo nivel necesarias para interactuar con sensores y actuadores.
+Se desarrollaron controladores de dispositivos (\textit{device drivers}) dedicados a gestionar directamente las unidades de hardware, mediante la abstracción de las operaciones de bajo nivel necesarias para interactuar con sensores y actuadores. En el caso particular del ADC, se implementó una capa intermedia con el patrón singleton para la construcción de la biblioteca de acceso, con el fin de evitar condiciones de carrera durante el acceso al periférico compartido entre múltiples tareas.
 
 \subsection{Gestión de fallos}
 El sistema incorpora mecanismos de detección y manejo de fallos a nivel de hardware y software. Cada tarea cuenta con rutinas de supervisión que identifican comportamientos anómalos o pérdida de respuesta de los dispositivos.
@@ -212,52 +212,92 @@ A continuación, en la figura \ref{fig:config} se puede observar un diagrama de 
 
 \section{Desarrollo del hardware}
 
-Esta sección describe el proceso completo de diseño, implementación y validación del hardware del sistema \textit{HydroGrow}. Se abordan las etapas de planificación del circuito basado en ESP32, selección de componentes específicos como sensores DS18B20, capacitivos v2.0, BH1750, módulos PH-4502C y conductividad eléctrica, integración de actuadores controlados por MOSFETs y relevadores de estado sólido, diseño de PCB con herramientas CAD, y pruebas exhaustivas de funcionalidad realizadas sobre el prototipo final.
+Esta sección describe el proceso completo de diseño, implementación y validación del hardware. Se abordan las etapas de planificación del circuito basado en ESP32, selección de componentes específicos como el sensor DS18B20, el sensor capacitivo v2.0, el sensor BH1750, el módulo PH-4502C y el sensor de conductividad eléctrica, integración de actuadores controlados por salida de reles, diseño de PCB con la herramienta KiCad, y pruebas de funcionalidad realizadas sobre el prototipo final.
 
 \subsection{Arquitectura general del sistema}
 % Describir el enfoque global del hardware: módulos, interconexiones y función de cada bloque.
-El sistema está conformado por módulos independientes que trabajan de manera coordinada. Entre ellos se incluyen el módulo de control principal, los sensores, los actuadores y los circuitos de alimentación.  
-La Figura~\ref{fig:arquitectura_hardware} muestra el diagrama general de interconexión del hardware.
-
-%\begin{figure}[H]
-%    \centering
-%    \includegraphics[width=0.95\textwidth]{figuras/arquitectura_hardware.png}
-%    \caption{Arquitectura general del hardware del sistema \textit{HydroGrow}.}
-%    \label{fig:arquitectura_hardware}
-%\end{figure}
+El sistema está conformado por una placa principal que integra módulos independientes que trabajan de manera coordinada. Entre estos se incluyen el módulo de control principal basado en ESP32, los sensores ambientales, los actuadores y la alimentación.
 
 \subsection{Diseño electrónico}
 % Explicar cómo se diseñaron las placas, esquemas, y conexiones eléctricas.
-El diseño electrónico se realizó en base a una arquitectura modular. Cada subsistema se desarrolló con su propio esquema eléctrico para facilitar el mantenimiento y la escalabilidad.  
-Se emplearon herramientas de diseño asistido por computadora (CAD) como \textit{KiCad} o \textit{Altium Designer} para la creación de los circuitos impresos (PCB).
+El diseño electrónico se realizó en base a una arquitectura modular centralizada en una placa principal. Esta placa interconecta los adaptadores de señal de los módulos sensores junto con la distribución de la alimentación, la conexión y protección de las GPIOs del microcontrolador junto con la protección general del circuito. La placa tiene completamente integrada la interfaz de salida con circuitos de aislamiento galvánico y relés para cada actuador, los cuales manejan 220V de corriente alterna. Para la alimentación de los módulos se implementó un regulador lineal LM1117, y para adaptar el módulo de pH de 5V a 3.3 V (nivel de referencia del ADC) se utilizó un divisor resistivo. Finalmente, se incorporó un \textit{shield} de salida con las GPIOs restantes para permitir la conexión de módulos adicionales en el futuro. Se empleó \textit{KiCad} para la creación del circuito impreso (PCB), como se detalla en las figuras \ref{fig:esquematico:base} y \ref{fig:esquematico:reles}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1.0\textwidth]{./Figures/hw_base.png}
+\caption{Circuito de la placa centralizadora.}
+\label{fig:esquematico:base}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{./Figures/hw_reles.png}
+\caption{Circuito de control de actuadores con aislamiento galvánico y relés para bomba, luces y ventiladores.}
+\label{fig:esquematico:reles}
+\end{figure}
 
 \subsubsection*{Módulo de control principal}
 % Describir el microcontrolador, sus interfaces y funciones.
-El núcleo del sistema está basado en el microcontrolador \texttt{ESP32}, que proporciona conectividad Wi-Fi, múltiples interfaces de comunicación (UART, I2C, SPI) y suficiente capacidad de procesamiento para la ejecución de tareas en tiempo real.
+El núcleo del sistema está basado en el microcontrolador \texttt{ESP32-WROOM-32} montado en una placa de desarrollo \texttt{ESP32-DevKitC}, que proporciona conectividad Wi-Fi, múltiples interfaces de comunicación (1-Wire para el sensor DS18B20, I2C para el sensor BH1750, entradas analógicas para el sensor capacitivo, PH-4502C y conductividad eléctrica, entrada digital para el sensor de nivel) y capacidad de procesamiento para la ejecución de tareas en tiempo real.
 
 \subsubsection*{Sensores}
 % Describir tipos, rangos y conexión de sensores.
-El sistema integra sensores de temperatura, humedad, pH, conductividad eléctrica y nivel de solución nutritiva. Cada sensor se conecta mediante buses digitales o entradas analógicas, según corresponda.  
-Las señales analógicas son acondicionadas mediante circuitos de adaptación de nivel y filtrado para mejorar la precisión de lectura.
+El sistema integra los sensores ambientales descritos en la sección \ref{sec:hw:components}. Desde la perspectiva de hardware, cada sensor se conecta mediante el protocolo apropiado a las interfaces del microcontrolador. Las señales analógicas son acondicionadas mediante circuitos de adaptación de nivel y filtrado con capacitores y resistencias para eliminar ruido y mejorar la precisión de lectura. Los sensores digitales utilizan los protocolos nativos de comunicación para una integración eficiente con el microcontrolador.
 
 \subsubsection*{Actuadores}
 % Describir bombas, luces, ventiladores, etc.
-Los actuadores incluyen bombas de agua, luces de crecimiento y ventiladores. Su control se realiza mediante transistores MOSFET y relevadores de estado sólido, que garantizan una conmutación eficiente y segura.
+Los actuadores del sistema fueron integrados para el control automatizado de las condiciones ambientales del cultivo hidropónico. El sistema incluye los siguientes actuadores comerciales principales:
+
+\begin{itemize}
+    \item \texttt{Bomba de riego}: bomba sumergible para acuario de 220 V con caudal fijo (1 l/min).
+    \item \texttt{Luces de crecimiento}: módulos LED full-spectrum (400-700 nm) con potencia de 20-50 W.
+    \item \texttt{Ventilador de circulación}: kit de ventiladores axiales de 12 V con caudal fijo con alimentación de 220 V.
+\end{itemize}
+
+El control de los actuadores se implementa mediante el sistema de relés mecanicos descrito en la sección de diseño electrónico, con interfaz a través de las salidas GPIO.
 
 \subsection{Sistema de alimentación}
 % Explicar fuentes, reguladores y protecciones eléctricas.
-El sistema cuenta con una fuente de alimentación conmutada de 12\,V, de la cual se derivan los niveles de 5\,V y 3.3\,V mediante reguladores lineales y DC-DC.  
-Se incorporaron fusibles de protección, diodos de polaridad inversa y condensadores de desacoplo para garantizar la estabilidad del sistema.
+El circuito se alimenta con una fuente conmutada de 5 V como entrada principal. A partir de esta se generan los niveles de tensión requeridos: 3.3 V para la alimentación de sensores y módulos periféricos mediante reguladores lineales, y 3.3 V para el microcontrolador ESP32 y demás circuitos digitales. Se implementaron múltiples capas de protección incluyendo fusibles de corriente nominal, diodos de polaridad inversa para prevenir daños por conexión errónea, y condensadores de desacoplo en cada punto de alimentación para mantener la estabilidad y reducir el ruido eléctrico en el sistema.
 
 \subsection{Diseño del PCB y ensamblaje}
 % Describir el proceso de diseño, fabricación y ensamblaje del circuito.
-El diseño del PCB prioriza la separación de señales de potencia y control, reduciendo interferencias electromagnéticas.  
-Las pistas críticas fueron dimensionadas de acuerdo con las corrientes máximas esperadas. El ensamblaje se realizó de manera manual utilizando componentes montados en superficie (SMD) y de orificio pasante (TH).
+El diseño del PCB se basa en principios prácticos de diseño electrónico. Se implementó un stack de dos capas con rutas de potencia y señales de control. Las pistas de alimentación se diseñaron con anchos de 1.0 mm para corrientes de hasta 2 A, mientras que las señales digitales utilizan pistas de 0.25 mm. Se incorporaron planos de masa continuos para mejorar la estabilidad del sistema.
+
+La disposición de componentes sigue una estrategia de flujo de señal lógico, con el microcontrolador ubicado en el centro y los conectores de sensores en los bordes para facilitar el cableado, como se puede observar en la figura \ref{fig:montaje}. Los reguladores de tensión se colocaron cerca de sus cargas correspondientes para minimizar la caída de voltaje en las pistas. Los capacitores de desacoplo se ubicaron adyacentes a cada pin de alimentación del microcontrolador para filtrar ruido de alta frecuencia.
+
+El ensamblado se realizó de manera manual en un entorno controlado con temperatura y humedad estables. Todos los componentes se soldaron manualmente con cautín utilizando soldadura con plomo. Se aplicaron medidas de protección ESD durante todo el proceso y se realizó inspección visual y con lupa para verificar la calidad de las uniones soldadas.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[a]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/3d_view.png}
+        \caption{Vista 3D de KiCad.}
+        \label{fig:montaje_a}
+    \end{subfigure}
+    \vspace{1em}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/esquematico.png}
+        \caption{Vista del esquematico.}
+        \label{fig:montaje_b}
+    \end{subfigure}
+    \vspace{1em}
+    \begin{subfigure}[c]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/montaje.png}
+        \caption{Vista final del PCB ensamblado.}
+        \label{fig:montaje_c}
+    \end{subfigure}
+    \vspace{1em}
+    \caption{Vistas del circuito impreso (PCB) del sistema.}
+    \label{fig:montaje}
+\end{figure}
 
 \subsection{Pruebas y validación}
 % Describir pruebas de continuidad, consumo, funcionamiento de sensores, etc.
-Se realizaron pruebas eléctricas de continuidad y verificación de polaridades antes de alimentar el circuito.  
-Posteriormente, se llevaron a cabo pruebas funcionales para validar el correcto funcionamiento de los sensores, actuadores y módulos de comunicación.  
+Se realizaron pruebas eléctricas de continuidad y verificación de polaridades antes de alimentar el circuito. La placa se energizó sin colocar los módulos y se midieron las tensiones en todos los puntos de alimentación para validar el correcto funcionamiento de los reguladores. Posteriormente, se llevaron a cabo pruebas funcionales para validar el correcto funcionamiento de los sensores, actuadores y módulos de comunicación.  
 Los resultados confirmaron la estabilidad del sistema bajo condiciones normales de operación.
 
 \subsection{Consideraciones de seguridad y mantenimiento}
@@ -265,6 +305,15 @@ Los resultados confirmaron la estabilidad del sistema bajo condiciones normales 
 El diseño incluye aislamiento galvánico en las líneas de control de los actuadores, protecciones contra sobrecorriente y sobretemperatura, y puntos de fácil acceso para mantenimiento.  
 Estas medidas aumentan la vida útil del sistema y reducen el riesgo de fallos eléctricos.
 
+\subsection{Ensamblado final}
+% Describir la integración de todos los componentes en el sistema completo.
+Una vez completado el ensamblaje del PCB, se procedió a la integración de los sensores y actuadores al sistema principal. Los sensores DS18B20, capacitivo v2.0, BH1750, PH-4502C, conductividad eléctrica y nivel de solución se conectaron a los puertos correspondientes de la PCB mediante cables de señal y cables de alimentación. Los actuadores (bomba sumergible de 220V, módulos LED full-spectrum y ventiladores axiales) se interconectaron al sistema de relés del PCB para su control automatizado.
+
+La fuente de alimentación conmutada de 5 V se conectó al circuito de entrada, proporcionando la energía necesaria para todo el sistema. Para garantizar la protección contra condiciones ambientales adversas, la placa se montó dentro de un gabinete estanco con certificación IP67. Se verificaron todas las conexiones eléctricas y mecánicas antes de proceder con las pruebas funcionales. Finalmente, se realizó una inspección visual completa del ensamblado para asegurar la correcta integración de todos los componentes y la ausencia de conexiones sueltas o daños en el cableado.
+
+Posteriormente, el sistema se instaló en el cultivo hidropónico. Los sensores se posicionaron estratégicamente en el sistema: el DS18B20 se sumergió en la solución nutritiva para monitoreo de temperatura, el sensor capacitivo se instaló en el sustrato para medir humedad, el BH1750 se ubicó sobre el área de cultivo para controlar iluminación, el PH-4502C y sensor de conductividad se colocaron en el depósito de solución, y el sensor de nivel se fijó en el tanque de reserva.
+
+Los actuadores se integraron al sistema hidropónico de la siguiente manera: la bomba sumergible se instaló en el depósito para recirculación, los módulos LED se montaron sobre el área de cultivo para iluminación, y los ventiladores se colocaron para circulación de aire, como se puede observar en la figura \ref{fig:pcb:inst_final}. Finalmente, se procedió a la configuración de parámetros del sistema antes de iniciar las operaciones automatizadas.
 
 %======================================================================
 
@@ -274,16 +323,20 @@ Esta sección describe los criterios de selección y el proceso de calibración 
 
 \subsection{Selección de sensores}
 % Explicar criterios de selección: precisión, rango, costo, disponibilidad, comunicación, etc.
-La selección de los sensores se realizó considerando precisión, estabilidad, compatibilidad eléctrica y facilidad de integración con el microcontrolador \texttt{ESP32}.  
-Los sensores elegidos fueron:
+La selección de los sensores se realizó considerando precisión, estabilidad, compatibilidad eléctrica, facilidad de integración con el microcontrolador \texttt{ESP32}, disponibilidad en el mercado local y costo. Los sensores elegidos fueron:
 
 \begin{itemize}
-    \item \textbf{Temperatura:} Sensor digital DS18B20, con rango de medición de $-55$\,°C a $+125$\,°C y resolución de 12 bits.
-    \item \textbf{Humedad del sustrato:} Sensor capacitivo analógico, resistente a la corrosión y con respuesta lineal en el rango de 0–100\,\%.
-    \item \textbf{pH:} Sonda analógica con amplificador de alta impedancia, calibrable mediante buffer estándar de pH 4, 7 y 10.
-    \item \textbf{Conductividad eléctrica (EC):} Sensor tipo electrodo doble, compatible con soluciones nutritivas de 0.1 a 20\,mS/cm.
-    \item \textbf{Nivel de solución:} Sensor ultrasónico con salida analógica, no intrusivo y resistente al ambiente húmedo.
-    \item \textbf{Luminosidad:} Sensor digital BH1750, con rango de 1 a 65\,535\,lx, conectado por bus I2C.
+    \item \textbf{Temperatura:} Sensor digital DS18B20, con rango de medición de $-55$ °C a $+125$ °C y resolución de 12 bits. El rango excede ampliamente los requisitos de $-15$ °C a $50$ °C del sistema, con una precisión de $\pm 0.0625$ °C que supera el $\pm 1$ °C requerido, asegurando mediciones confiables en condiciones ambientales variables.
+
+    \item \textbf{Humedad del sustrato:} Sensor capacitivo analógico, resistente a la corrosión y con respuesta lineal en el rango de 0–100 \%. Cumple exactamente con el rango requerido de 0-100 \% y la precisión de $\pm 3$ \%, con respuesta lineal que facilita la calibración y asegura mediciones estables en ambientes húmedos y corrosivos.
+
+    \item \textbf{pH:} Sonda analógica con amplificador de alta impedancia, rango típico de 0-14, calibrable mediante buffer estándar de pH 4, 7 y 10. El rango amplio (0-14) cubre holgadamente el intervalo requerido de 5.5-7.5, con calibración estándar que garantiza la precisión de $\pm 0.1$ especificada para el monitoreo de soluciones nutritivas.
+
+    \item \textbf{Conductividad eléctrica (EC):} Sensor TDS Meter v1.0 tipo electrodo doble, con rango de medición de 0-1000 ppm (equivalente a 0-2 mS/cm). Aunque el rango de 0-2 mS/cm no cubre completamente el requisito especificado de 1-4 mS/cm, sí abarca el intervalo necesario para cultivos hidropónicos (0-2 mS/cm), con las ventajas adicionales de su bajo costo y amplia disponibilidad tanto en el mercado local como internacional.
+
+    \item \textbf{Nivel de solución:} Sensor de flotador con interruptor convencional, con salida digital, no intrusivo y resistente al ambiente húmedo. Proporciona una detección simple y confiable del nivel mínimo requerido (3/4 de la altura del contenedor) mediante una señal digital clara, ideal para alertas automáticas sin necesidad de mediciones continuas.
+
+    \item \textbf{Luminosidad:} Sensor digital BH1750, con rango de 1 a 65\,535\,lx, conectado por bus I2C. El amplio rango dinámico permite un control preciso de la iluminación artificial requerida para el ciclo día-noche del cultivo, con interfaz I2C que optimiza la integración con el microcontrolador ESP32.
 \end{itemize}
 
 \subsection{Calibración de sensores}
@@ -291,23 +344,17 @@ Los sensores elegidos fueron:
 Cada sensor fue sometido a un proceso de calibración inicial para asegurar lecturas precisas:
 
 \begin{itemize}
-    \item Los sensores de pH y EC se calibraron con soluciones patrón de referencia, registrando los valores de compensación en el archivo \texttt{config.json}.
-    \item Los sensores de temperatura y humedad se verificaron frente a instrumentos certificados, aplicando correcciones lineales cuando fue necesario.
-    \item El sensor de luminosidad se ajustó mediante comparación con un luxómetro de laboratorio.
-    \item El sensor de nivel se calibró mediante mediciones en puntos de referencia físicos (mínimo, medio y máximo).
+    \item Para calibrar el sensor de pH, se utilizaron soluciones buffer de pH 4 y 6.86 $\pm 0.02$ a temperatura ambiente. Se limpió el sensor con agua destilada y se sumergió en la solución de pH 4 durante 1 minutos, y se ajustó el potenciomentro del módulo de adaptación. Luego, se ajustó el sensor hasta que coincidió con el valor del buffer. Posteriormente, se repitió el proceso con la solución de pH 6.86 durante 1 minutos. Finalmente, se midió agua de red para verificar que el pH resportado fuera cercano a 7.5.
+    \item Para calibrar el sensor de conductividad, se utilizó agua destilada para marcar el valor de 0 mS/cm y una sonda patrón de conductividad para marcar el valor de 1 mS/cm mediante una solución de NaCl de 1 mS/cm a temperatura ambiente.
+    \item Para calibrar el sensor de temperatura, se utilizó un termómetro patrón como referencia y se realizaron mediciones en dos puntos fijos: 0 °C, obtenido mediante una mezcla en equilibrio de hielo triturado y agua, y a aproximadamente 50 °C. Ambos instrumentos se colocaron a la misma profundidad, sin contacto con las paredes del recipiente y tras alcanzar el equilibrio térmico, logrando así una calibración práctica y suficientemente precisa para las condiciones disponibles. Para mantener el sistema a una temperatura constante, se utilizaron 1.5 litros de agua en un termo de vidrio.
+    \item Para calibrar el sensor de humedad, se realizó una medición en un ambiente controlado con un humedad del sustrato de 0 \%. Se ajustó el sensor hasta que coincidió con el valor medido y luego se sumergió completamente en agua para verificar que el sensor resportara el valor máximo de 100 \%.
+    \item El sensor de luminosidad no requirió ya que vino calibrado de fábrica.
 \end{itemize}
-
-Las constantes de calibración se almacenan en memoria flash y se cargan durante el arranque del sistema. Esto permite conservar los ajustes incluso después de un reinicio y garantiza la coherencia en las mediciones a lo largo del tiempo.
 
 %======================================================================
 \section{Interfaz gráfica}
 
-Esta sección describe el diseño, estructura y funcionamiento de la interfaz gráfica del sistema \textit{HydroGrow}. El objetivo principal de la interfaz es proporcionar al usuario una visualización clara y en tiempo real de los parámetros del cultivo, además de ofrecer herramientas intuitivas para el control y la configuración del sistema.
-
-\subsection{Arquitectura del sistema de interfaz}
-% Describir la estructura general de la interfaz (cliente-servidor, arquitectura REST, etc.)
-La interfaz se basa en una arquitectura cliente-servidor. El servidor web embebido en el \texttt{ESP32} expone una API REST que permite la comunicación entre el hardware y la aplicación móvil o el navegador web del usuario.  
-El cliente se implementa como una aplicación web ligera desarrollada en \textit{HTML5}, \textit{CSS3} y \textit{JavaScript}, optimizada para dispositivos móviles y de escritorio.
+Esta sección describe el diseño, estructura y funcionamiento de la interfaz gráfica del sistema desarrollada en React. El objetivo de la interfaz es proporcionar al usuario una visualización clara y en tiempo real de los parámetros del cultivo, además de ofrecer herramientas para el control y la configuración.
 
 %\begin{figure}[H]
 %    \centering
@@ -318,49 +365,98 @@ El cliente se implementa como una aplicación web ligera desarrollada en \textit
 
 \subsection{Diseño de la interfaz de usuario}
 % Describir la disposición visual, estilo, principios de diseño y usabilidad.
-El diseño se desarrolló siguiendo los principios de usabilidad y consistencia visual. Se empleó un esquema de colores contrastantes que facilita la lectura de valores críticos y una disposición modular basada en tarjetas o paneles.  
+El diseño se desarrolló siguiendo la metodología de diseño \textit{mobile-first}. Se empleó un esquema de colores contrastantes que facilita la lectura de valores y una disposición modular basada en tarjetas.  
 Cada sección agrupa información relacionada, lo que simplifica la navegación y permite una rápida identificación de los estados del sistema.
 
-\subsubsection*{Panel de monitoreo}
+\subsection{Seguridad y autenticación}
+% Describir autenticación de usuarios, cifrado, etc.
+Para garantizar la seguridad de las comunicaciones, la API REST implementa un mecanismo de autenticación por token el que se obtiene a partir de un login con usuario y contraseña (ver Figura \ref{fig:login}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{./Figures/captures/login.jpeg}
+    \caption{Interfaz de login.}
+    \label{fig:login}
+\end{figure}
+
+\subsubsection*{Monitoreo de sensores}
 % Explicar qué muestra y cómo se actualiza.
-El panel principal presenta en tiempo real los valores de los sensores de temperatura, humedad, pH, conductividad eléctrica y nivel de solución.  
-Las mediciones se actualizan mediante peticiones periódicas a la API REST, lo que garantiza una visualización fluida sin recargar la página.
+El panel principal presenta en tiempo real los valores de los sensores de temperatura, humedad, pH, conductividad eléctrica y nivel de solución. Las mediciones se actualizan mediante peticiones periódicas a la API REST, lo que garantiza una visualización fluida sin recargar la página.
+Adicionalmente, se muestra un gráfico que representa la evolución de los valores de los sensores a lo largo del tiempo (ver Figura \ref{fig:sensores_grafico}).
 
-\subsubsection*{Panel de control}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/sensores_1.jpeg}
+        \caption{Vista inicial de la sección de monitoreo de sensores.}
+        \label{fig:sensores_grafico_a}
+    \end{subfigure}
+    \vspace{1em}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/sensores_2.jpeg}
+        \caption{Vista final de la sección de monitoreo de sensores.}
+        \label{fig:sensores_grafico_b}
+    \end{subfigure}
+    \vspace{1em}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/sensores_graficos.jpeg}
+        \caption{Gráfico de los valores de los sensores en el tiempo.}
+        \label{fig:sensores_grafico_c}
+    \end{subfigure}
+    \caption{Interfaz de monitoreo de sensores.}
+    \label{fig:sensores_grafico}
+\end{figure}
+
+\subsubsection*{Control de actuadores}
 % Describir cómo el usuario controla actuadores o configuraciones.
-En esta sección, el usuario puede activar o desactivar manualmente los actuadores (bomba de riego, iluminación, ventilación) y ajustar parámetros de operación.  
-Las acciones se transmiten al servidor mediante solicitudes \texttt{POST} a los endpoints definidos en el módulo de control.
+En esta sección, el usuario tiene la capacidad de activar o desactivar manualmente los actuadores, como la bomba de riego, la iluminación y la ventilación, mientras visualiza el estado actual de cada uno de ellos (ver Figura \ref{fig:actuadores}). Las acciones se transmiten al servidor mediante solicitudes \texttt{POST} y \texttt{GET} a los endpoints correspondientes.
 
-\subsubsection*{Panel de configuración}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{./Figures/captures/actuadores.jpeg}
+    \caption{Sección de control de actuadores.}
+    \label{fig:actuadores}
+\end{figure}
+
+\subsubsection*{Configuración del sistema}
 % Explicar cómo se gestionan los parámetros del sistema.
-El panel de configuración permite modificar umbrales de alarma, intervalos de muestreo y credenciales de red.  
-Una vez confirmados los cambios, el sistema actualiza el archivo \texttt{config.json} en memoria flash y propaga los nuevos valores a los controladores correspondientes.
+El panel de configuración permite modificar umbrales de alarma, intervalos de muestreo y credenciales de red (ver Figura \ref{fig:configuracion}). Una vez confirmados los cambios, el sistema actualiza el archivo \texttt{config.json} en memoria flash y propaga los nuevos valores a los controladores correspondientes.
 
-\subsection{Comunicación con la API REST}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/config_1.jpeg}
+        \caption{Vista inicial de la sección de configuración.}
+        \label{fig:configuracion_a}
+    \end{subfigure}
+    \vspace{1em}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/config_2.jpeg}
+        \caption{Vista final de la sección de configuración.}
+        \label{fig:configuracion_b}
+    \end{subfigure}
+    \caption{Sección de configuración del sistema.}
+    \label{fig:configuracion}
+\end{figure}
+
+\subsection{Logs del sistema}
 % Explicar endpoints y métodos principales.
-La comunicación entre la interfaz y el sistema embebido se realiza a través de una API REST que sigue una estructura estandarizada.  
-Los principales endpoints son:
+Por ultimo, el panel de logs muestra los eventos relevantes del sistema, como errores y advertencias (ver Figura \ref{fig:logs}).
 
-\begin{itemize}
-    \item \texttt{GET /status}: obtiene los valores actuales de sensores y estado del sistema.
-    \item \texttt{POST /config}: actualiza la configuración general.
-    \item \texttt{POST /control}: envía comandos directos a los actuadores.
-    \item \texttt{GET /alarms}: consulta el registro de alarmas activas o históricas.
-\end{itemize}
-
-Cada solicitud y respuesta se maneja en formato \texttt{JSON}, lo que facilita la integración con otras plataformas o aplicaciones externas.
-
-\subsection{Pruebas de usabilidad}
-% Describir ensayos con usuarios, tiempos de respuesta, navegabilidad, etc.
-Se realizaron pruebas de usabilidad con un grupo de usuarios para evaluar la claridad de la información y la facilidad de navegación.  
-Los resultados demostraron que la estructura modular reduce el tiempo de acceso a la información y permite la configuración completa del sistema sin requerir conocimientos técnicos avanzados.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{./Figures/captures/logs.jpeg}
+    \caption{Logs del sistema.}
+    \label{fig:logs}
+\end{figure}
 
 \subsection{Compatibilidad y optimización}
 % Mencionar compatibilidad con dispositivos y rendimiento.
 La interfaz es completamente responsiva y se adapta a diferentes tamaños de pantalla. Se optimizó el rendimiento mediante la reducción de recursos estáticos, compresión \texttt{gzip} y almacenamiento en caché de datos locales.  
 Estas optimizaciones minimizan el tiempo de carga y mejoran la experiencia del usuario incluso en conexiones inalámbricas inestables.
 
-\subsection{Seguridad y autenticación}
-% Describir autenticación de usuarios, cifrado, etc.
-Para garantizar la seguridad de las comunicaciones, la API REST implementa un mecanismo de autenticación por token y el intercambio de datos se cifra mediante HTTPS.  
-Además, se incorporaron restricciones de acceso por rol para prevenir modificaciones no autorizadas en la configuración del sistema.
