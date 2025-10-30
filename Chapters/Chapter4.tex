@@ -2,293 +2,344 @@
 
 \chapter{Ensayos y resultados} % Main chapter title
 
-Si en el texto se hace alusión a diferentes partes del trabajo referirse a ellas como capítulo, sección o subsección según corresponda. Por ejemplo: ``En el capítulo \ref{Chapter1} se explica tal cosa'', o ``En la sección \ref{sec:ejemplo} se presenta lo que sea'', o ``En la subsección \ref{subsec:ejemplo} se discute otra cosa''.
+En este capítulo se presentan las pruebas y ensayos realizados sobre el sistema de monitoreo y gestión  de cultivos hidropónicos verticales desarrollado.  
+El objetivo principal fue verificar el correcto funcionamiento del hardware y firmware, así como validar el cumplimiento de los requerimientos funcionales definidos en las etapas de diseño.
+Cabe destacar que en este capítulo se presentan casos de prueba representativos, seleccionados de acuerdo con su relevancia para demostrar el funcionamiento del sistema. La metodología descrita se aplicó de manera consistente en todos los ensayos realizados.
 
-Cuando se quiere poner una lista tabulada, se hace así:
+\section{Pruebas del firmware}
+Antes de la implementación en la PCB, se validaron los componentes del firmware. Cada funcionalidad se evaluó de manera aislada mediante pruebas unitarias para verificar su funcionamiento antes de la integración del sistema.
+
+\subsection{Pruebas unitarias}
+Se implementaron pruebas unitarias utilizando \textit{Ceedling} sobre los drivers y componentes del firmware. Este enfoque permitió automatizar la ejecución de pruebas a medida que se fue desarrollando el código. 
+
+En la figura \ref{fig:cobertura_codigo} se puede observar el resultado de las pruebas realizadas sobre el driver del sensor DS18B20.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{./Figures/test/unit_test.png}
+\caption{Reporte de pruebas unitarias de Ceedling}
+\label{fig:cobertura_codigo}
+\end{figure}
+
+\subsection{Pruebas de comunicación entre módulos}
+
+\subsubsection{Arquitectura pub/sub}
+La validación del sistema de mensajería confirmó la correcta distribución de mensajes a través de un buffer estático, donde cada suscriptor se identifica mediante su ID de hilo. Las pruebas demostraron una gestión adecuada de semáforos durante la publicación y suscripción, lo que evita condiciones de carrera. Se comprobó la entrega confiable a múltiples destinatarios con preservación de la integridad de la información.
+
+
+Como se muestra en la figura \ref{fig:buffer_overflow}, cuando el buffer alcanza su capacidad máxima, el sistema descarta automáticamente los mensajes más antiguos sin interrumpir el flujo de comunicación. Este comportamiento se observa claramente al triplicar el tiempo entre lecturas, lo que permite verificar el correcto manejo de desbordamiento.
+Finalmente, se estableció una relación 1:1 entre publicadores y suscriptores, lo que permitió mantener estable cada canal y garantizar un flujo de información equilibrado.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/test/full_queue.png}
+        {\small \caption{Manejo de desbordamiento del buffer}
+        \label{fig:buffer_overflow}}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/test/suscripcion.png}
+        \caption{Proceso de suscripción a canales}
+        \label{fig:suscripcion}
+    \end{subfigure}
+    \caption{Evidencia de las pruebas del sistema de mensajería}
+    \label{fig:pruebas_mensajeria}
+\end{figure}
+    
+
+\subsubsection{API REST con Postman}
+Se desarrollaron pruebas de integración para los endpoints REST expuestos por el sistema, organizados por funcionalidad.
+A continuacion se listan los endpoints disponibles.
 
 \begin{itemize}
-	\item Este es el primer elemento de la lista.
-	\item Este es el segundo elemento de la lista.
+    \item \textbf{Autenticación}
+    \begin{itemize}
+        \item \texttt{POST /v1/login} : Autenticación de usuario
+    \end{itemize}
+    
+    \item \textbf{Estado del Sistema}
+    \begin{itemize}
+        \item \texttt{GET /v1/status} : Estado general del sistema
+    \end{itemize}
+    
+    \item \textbf{Sensores}
+    \begin{itemize}
+        \item \texttt{GET /v1/sensors} : Lectura de datos de sensores (temperatura, humedad, pH, CE, etc.)
+    \end{itemize}
+    
+    \item \textbf{Actuadores}
+    \begin{itemize}
+        \item \texttt{GET /v1/actuators} : Estado actual de los actuadores
+        \item POST /v1/actuators - Control de actuadores (bomba, ventilador, luces, calefactor)
+    \end{itemize}
+    
+    \item \textbf{Configuración}
+    \begin{itemize}
+        \item \texttt{GET /v1/config} : Obtener configuración actual
+        \item \texttt{POST /v1/config} : Actualizar configuración
+    \end{itemize}
+    
+    \item \textbf{Registros del Sistema}
+    \begin{itemize}
+        \item \texttt{GET /v1/logs} : Obtener registros del sistema
+        \item \texttt{DELETE /v1/log/clean} : Limpiar registros
+    \end{itemize}
 \end{itemize}
 
-Notar el uso de las mayúsculas y el punto al final de cada elemento.
+Todas las peticiones requieren autenticación mediante token, excepto el endpoint de login. El token debe incluirse en el encabezado \texttt{Authorization} de las peticiones posteriores a la autenticación. La figura \ref{fig:pruebas_api} muestra la petición de actualización de configuración realizada con Postman, mientras que la figura \ref{fig:consola_config} muestra la salida correspondiente en la consola de la ESP32 durante este proceso.
 
-Si se desea poner una lista numerada el formato es este:
-
-\begin{enumerate}
-	\item Este es el primer elemento de la lista.
-	\item Este es el segundo elemento de la lista.
-\end{enumerate}
-
-Notar el uso de las mayúsculas y el punto al final de cada elemento.
-
-\subsection{Este es el título de una subsección}
-\label{subsec:ejemplo}
-
-Se recomienda no utilizar \textbf{texto en negritas} en ningún párrafo, ni tampoco texto \underline{subrayado}. En cambio sí se debe utilizar \textit{texto en itálicas} para palabras en un idioma extranjero, al menos la primera vez que aparecen en el texto. En el caso de palabras que estamos inventando se deben utilizar ``comillas'', así como también para citas textuales. Por ejemplo, un \textit{digital filter} es una especie de ``selector'' que permite separar ciertos componentes armónicos en particular.
-
-La escritura debe ser impersonal. Por ejemplo, no utilizar ``el diseño del firmware lo hice de acuerdo con tal principio'', sino ``el firmware fue diseñado utilizando tal principio''. 
-
-El trabajo es algo que al momento de escribir la memoria se supone que ya está concluido, entonces todo lo que se refiera a hacer el trabajo se narra en tiempo pasado, porque es algo que ya ocurrió. Por ejemplo, "se diseñó el firmware empleando la técnica de test driven development".
-
-En cambio, la memoria es algo que está vivo cada vez que el lector la lee. Por eso transcurre siempre en tiempo presente, como por ejemplo:
-
-``En el presente capítulo se da una visión global sobre las distintas pruebas realizadas y los resultados obtenidos. Se explica el modo en que fueron llevados a cabo los test unitarios y las pruebas del sistema''.
-
-Se recomienda no utilizar una sección de glosario sino colocar la descripción de las abreviaturas como parte del mismo cuerpo del texto. Por ejemplo, RTOS (\textit{Real Time Operating System}, Sistema Operativo de Tiempo Real) o en caso de considerarlo apropiado mediante notas a pie de página.
-
-Si se desea indicar alguna página web utilizar el siguiente formato de referencias bibliográficas, dónde las referencias se detallan en la sección de bibliografía de la memoria, utilizado el formato establecido por IEEE en \citep{IEEE:citation}. Por ejemplo, ``el presente trabajo se basa en la plataforma EDU-CIAA-NXP \citep{CIAA}, la cual...''.
-
-\subsection{Figuras} 
-
-Al insertar figuras en la memoria se deben considerar determinadas pautas. Para empezar, usar siempre tipografía claramente legible. Luego, tener claro que \textbf{es incorrecto} escribir por ejemplo esto: ``El diseño elegido es un cuadrado, como se ve en la siguiente figura:''
-
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
-\includegraphics[scale=.45]{./Figures/cuadradoAzul.png}
+\includegraphics[width=0.9\textwidth]{./Figures/test/config_sin_token.png}
+\caption{Respuesta del servidor al intentar acceder sin autenticación}
+\label{fig:config_sin_token}
 \end{figure}
 
-La forma correcta de utilizar una figura es con referencias cruzadas, por ejemplo: ``Se eligió utilizar un cuadrado azul para el logo, como puede observarse en la figura \ref{fig:cuadradoAzul}''.
+Como se observa en la figura \ref{fig:config_sin_token}, el sistema rechaza correctamente las peticiones que no incluyen un token de autenticación válido y devuelve un código de estado HTTP 401 (No autorizado) junto con un mensaje de error.
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[scale=.45]{./Figures/cuadradoAzul.png}
-	\caption{Ilustración del cuadrado azul que se eligió para el diseño del logo.}
-	\label{fig:cuadradoAzul}
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{0.9\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{./Figures/test/config_postman.png}
+    \caption{Pruebas de API con Postman - actualización de la configuración}
+    \label{fig:pruebas_api}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.9\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{./Figures/test/update_config.png}
+    \caption{Salida por consola durante la actualización de la configuración}
+    \label{fig:consola_config}
+\end{subfigure}
+\caption{Proceso de actualización de configuración.}
+\label{fig:configuracion_completa}
 \end{figure}
 
-El texto de las figuras debe estar siempre en español, excepto que se decida reproducir una figura original tomada de alguna referencia. En ese caso la referencia de la cual se tomó la figura debe ser indicada en el epígrafe de la figura e incluida como una nota al pie, como se ilustra en la figura \ref{fig:palabraIngles}.
+\subsubsection{Gestión de logs}
+Se verificó el sistema de rotación de logs con los siguientes aspectos:
+\begin{itemize}
+    \item Rotación automática al alcanzar el tamaño máximo configurado
+    \item Conservación de los logs más recientes según la política de retención
+    \item Formato consistente de los mensajes de log
+    \item Niveles de severidad apropiados (DEBUG, INFO, WARN, ERROR, ALERT)
+\end{itemize}
 
-\begin{figure}[htpb]
-	\centering
-	\includegraphics[scale=.3]{./Figures/word.jpeg}
-	\caption{Imagen tomada de la página oficial del procesador\protect\footnotemark.}
-	\label{fig:palabraIngles}
-\end{figure}
+\subsubsection{Comunicación con la nube}
+Se implementó un sistema de envío de datos a un servidor backend mediante peticiones HTTP POST. El sistema utiliza un único endpoint para el envío de datos, con un esquema JSON que incluye todos los parámetros del sistema.
 
-\footnotetext{Imagen tomada de \url{https://goo.gl/images/i7C70w}}
+\begin{itemize}
+    \item \textbf{Endpoint:} \texttt{http://IP-raspberry-pi/api/v1/telemetry}
+    \item \textbf{Método:} POST
+    \item \textbf{Autenticación:} Sin autenticación (en fase de pruebas)
+    \item \textbf{Formato de los datos:} JSON
+\end{itemize}
 
-La figura y el epígrafe deben conformar una unidad cuyo significado principal pueda ser comprendido por el lector sin necesidad de leer el cuerpo central de la memoria. Para eso es necesario que el epígrafe sea todo lo detallado que corresponda y si en la figura se utilizan abreviaturas entonces aclarar su significado en el epígrafe o en la misma figura.
-
-
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[scale=.37]{./Figures/questionMark.png}
-	\caption{¿Por qué de pronto aparece esta figura?}
-	\label{fig:questionMark}
-\end{figure}
-
-Nunca colocar una figura en el documento antes de hacer la primera referencia a ella, como se ilustra con la figura \ref{fig:questionMark}, porque sino el lector no comprenderá por qué de pronto aparece la figura en el documento, lo que distraerá su atención.
-
-Otra posibilidad es utilizar el entorno \textit{subfigure} para incluir más de una figura, como se puede ver en la figura \ref{fig:three graphs}. Notar que se pueden referenciar también las figuras internas individualmente de esta manera: \ref{fig:1de3}, \ref{fig:2de3} y \ref{fig:3de3}.
- 
-\begin{figure}[!htpb]
-     \centering
-     \begin{subfigure}[b]{0.3\textwidth}
-         \centering
-         \includegraphics[width=.65\textwidth]{./Figures/questionMark}
-         \caption{Un caption.}
-         \label{fig:1de3}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[b]{0.3\textwidth}
-         \centering
-         \includegraphics[width=.65\textwidth]{./Figures/questionMark}
-         \caption{Otro.}
-         \label{fig:2de3}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[b]{0.3\textwidth}
-         \centering
-         \includegraphics[width=.65\textwidth]{./Figures/questionMark}
-         \caption{Y otro más.}
-         \label{fig:3de3}
-     \end{subfigure}
-        \caption{Tres gráficos simples.}
-        \label{fig:three graphs}
-\end{figure}
-
-El código para generar las imágenes se encuentra disponible para su reutilización en el archivo \file{Chapter2.tex}.
-
-\subsection{Tablas}
-
-Para las tablas utilizar el mismo formato que para las figuras, sólo que el epígrafe se debe colocar arriba de la tabla, como se ilustra en la tabla \ref{tab:peces}. Observar que sólo algunas filas van con líneas visibles y notar el uso de las negritas para los encabezados.  La referencia se logra utilizando el comando \verb|\ref{<label>}| donde label debe estar definida dentro del entorno de la tabla.
-
+\textbf{Estructura del cuerpo de la petición}
 \begin{verbatim}
-\begin{table}[h]
-	\centering
-	\caption[caption corto]{caption largo más descriptivo}
-	\begin{tabular}{l c c}    
-		\toprule
-		\textbf{Especie}     & \textbf{Tamaño} & \textbf{Valor}\\
-		\midrule
-		Amphiprion Ocellaris & 10 cm           & \$ 6.000 \\		
-		Hepatus Blue Tang    & 15 cm           & \$ 7.000 \\
-		Zebrasoma Xanthurus  & 12 cm           & \$ 6.800 \\
-		\bottomrule
-		\hline
-	\end{tabular}
-	\label{tab:peces}
-\end{table}
-\end{verbatim}
-
-
-\begin{table}[h]
-	\centering
-	\caption[caption corto]{caption largo más descriptivo.}
-	\begin{tabular}{l c c}    
-		\toprule
-		\textbf{Especie} 	 & \textbf{Tamaño} 		& \textbf{Valor}  \\
-		\midrule
-		Amphiprion Ocellaris & 10 cm 				& \$ 6.000 \\		
-		Hepatus Blue Tang	 & 15 cm				& \$ 7.000 \\
-		Zebrasoma Xanthurus	 & 12 cm				& \$ 6.800 \\
-		\bottomrule
-		\hline
-	\end{tabular}
-	\label{tab:peces}
-\end{table}
-
-En cada capítulo se debe reiniciar el número de conteo de las figuras y las tablas, por ejemplo, figura 2.1 o tabla 2.1, pero no se debe reiniciar el conteo en cada sección. Por suerte la plantilla se encarga de esto por nosotros.
-
-\subsection{Ecuaciones}
-\label{sec:Ecuaciones}
-
-Al insertar ecuaciones en la memoria dentro de un entorno \textit{equation}, éstas se numeran en forma automática  y se pueden referir al igual que como se hace con las figuras y tablas, por ejemplo ver la ecuación \ref{eq:metric}.
-
-\begin{equation}
-	\label{eq:metric}
-	ds^2 = c^2 dt^2 \left( \frac{d\sigma^2}{1-k\sigma^2} + \sigma^2\left[ d\theta^2 + \sin^2\theta d\phi^2 \right] \right)
-\end{equation}
-                                                        
-Es importante tener presente que si bien las ecuaciones pueden ser referidas por su número, también es correcto utilizar los dos puntos, como por ejemplo ``la expresión matemática que describe este comportamiento es la siguiente:''
-
-\begin{equation}
-	\label{eq:schrodinger}
-	\frac{\hbar^2}{2m}\nabla^2\Psi + V(\mathbf{r})\Psi = -i\hbar \frac{\partial\Psi}{\partial t}
-\end{equation}
-
-Para generar la ecuación \ref{eq:metric} se utilizó el siguiente código:
-
-\begin{verbatim}
-\begin{equation}
-	\label{eq:metric}
-	ds^2 = c^2 dt^2 \left( \frac{d\sigma^2}{1-k\sigma^2} + 
-	\sigma^2\left[ d\theta^2 + 
-	\sin^2\theta d\phi^2 \right] \right)
-\end{equation}
-\end{verbatim}
-
-Y para la ecuación \ref{eq:schrodinger}:
-
-\begin{verbatim}
-\begin{equation}
-	\label{eq:schrodinger}
-	\frac{\hbar^2}{2m}\nabla^2\Psi + V(\mathbf{r})\Psi = 
-	-i\hbar \frac{\partial\Psi}{\partial t}
-\end{equation}
-
-\end{verbatim}
-
-\definecolor{mygreen}{rgb}{0,0.6,0}
-\definecolor{mygray}{rgb}{0.5,0.5,0.5}
-\definecolor{mymauve}{rgb}{0.58,0,0.82}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% parámetros para configurar el formato del código en los entornos lstlisting
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\lstset{ %
-  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
-  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
-  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
-  breaklines=true,                 % sets automatic line breaking
-  captionpos=b,                    % sets the caption-position to bottom
-  commentstyle=\color{mygreen},    % comment style
-  deletekeywords={...},            % if you want to delete keywords from the given language
-  %escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
-  %extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
-  %frame=single,	                % adds a frame around the code
-  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
-  keywordstyle=\color{blue},       % keyword style
-  language=[ANSI]C,                % the language of the code
-  %otherkeywords={*,...},           % if you want to add more keywords to the set
-  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
-  numbersep=5pt,                   % how far the line-numbers are from the code
-  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
-  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
-  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
-  showstringspaces=false,          % underline spaces within strings only
-  showtabs=false,                  % show tabs within strings adding particular underscores
-  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
-  stringstyle=\color{mymauve},     % string literal style
-  tabsize=2,	                   % sets default tabsize to 2 spaces
-  title=\lstname,                  % show the filename of files included with \lstinputlisting; also try caption instead of title
-  morecomment=[s]{/*}{*/}
+{
+  "device_id": "hydrogrow-001",
+  "timestamp": "2025-03-30T14:12:00Z",
+  "sensors": {
+    "temperature": 25.5,
+    "humidity": 65.2,
+    "ph": 6.2,
+    "ec": 1.1,
+    "light_intensity": 750,
+    "water_level": "NORMAL"
+  },
+  "actuators": {
+    "pump": false,
+    "fan": true,
+    "light": false,
+    "heater": false
+  },
+  "system": {
+    "uptime_seconds": 45234
+  },
+  "alerts": []
 }
-
-
-%----------------------------------------------------------------------------------------
-%	SECTION 1
-%----------------------------------------------------------------------------------------
-\section{Análisis del software}
- 
-La idea de esta sección es resaltar los problemas encontrados, los criterios utilizados y la justificación de las decisiones que se hayan tomado.
-
-Se puede agregar código o pseudocódigo dentro de un entorno lstlisting con el siguiente código:
-
-\begin{verbatim}
-\begin{lstlisting}[caption= "un epígrafe descriptivo"]
-	las líneas de código irían aquí...
-\end{lstlisting}
 \end{verbatim}
 
-A modo de ejemplo:
+\textbf{Servidor de telemetría}
+El servidor de telemetría usa Node.js con Express para recibir datos mediante una API REST. Los datos se guardan en una base de datos PostgreSQL. En esta versión inicial de pruebas no se implementó autenticación ni encriptación, pero están planificadas para versiones futuras.
 
-\begin{lstlisting}[label=cod:vControl,caption=Pseudocódigo del lazo principal de control.]  % Start your code-block
+COLOCAR UNA CAPTURA DE LA BASE DE DATOS DEL SERVIDOR DE TELEMETRÍA
 
-#define MAX_SENSOR_NUMBER 3
-#define MAX_ALARM_NUMBER  6
-#define MAX_ACTUATOR_NUMBER 6
+\textbf{Características de implementación}
+El sistema implementa un esquema de envío periódico de datos cada 5 minutos. Todos los registros incluyen un timestamp en formato ISO 8601 para mantener una referencia temporal consistente.
 
-uint32_t sensorValue[MAX_SENSOR_NUMBER];		
-FunctionalState alarmControl[MAX_ALARM_NUMBER];	//ENABLE or DISABLE
-state_t alarmState[MAX_ALARM_NUMBER];						//ON or OFF
-state_t actuatorState[MAX_ACTUATOR_NUMBER];			//ON or OFF
+\subsubsection{Estado del sistema y actuadores}
+Se implementaron pruebas para verificar:
+\begin{itemize}
+    \item Sincronización del estado entre tareas
+    \item Transiciones de estado válidas
+    \item Persistencia del estado ante reinicios
+    \item Control preciso de actuadores según comandos recibidos
+\end{itemize}
 
-void vControl() {
+\subsubsection{Pruebas de condiciones de carrera}
+En el entorno FreeRTOS, se validó el sistema ante condiciones de carrera mediante:
+\begin{itemize}
+    \item Acceso concurrente a recursos compartidos
+    \item Prioridades de tareas y herencia de prioridad
+    \item Secciones críticas y mecanismos de sincronización
+    \item Manejo de colas de mensajes llenas/vacías
+\end{itemize}
 
-	initGlobalVariables();
-	
-	period = 500 ms;
-		
-	while(1) {
+\subsubsection{Manejo de configuración}
+Se probó la generación, lectura y actualización del archivo config.json, verificando:
+\begin{itemize}
+    \item Creación con valores por defecto
+    \item Carga de configuración al inicio
+    \item Actualización dinámica de parámetros
+    \item Validación de valores configurados
+    \item Robustez ante archivos corruptos o faltantes
+\end{itemize}
 
-		ticks = xTaskGetTickCount();
-		
-		updateSensors();
-		
-		updateAlarms();
-		
-		controlActuators();
-		
-		vTaskDelayUntil(&ticks, period);
-	}
-}
-\end{lstlisting}
-
-
-
+\subsubsection{Conectividad de red}
+Las pruebas de conectividad verificaron la configuración inicial mediante WPS con el botón físico del dispositivo, que incluyó la asignación de dirección IP estática (192.168.0.100/24, con red estándar de gateway 192.168.0.x) en la red local y el almacenamiento persistente de credenciales en la memoria flash. En la figura \ref{fig:inicializacion}, se muestra el resultado de la inicialización del sistema y se aprecia la configuración de la IP estática junto con la configuración WPS.
 
 
-\label{Chapter4} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
-Todos los capítulos deben comenzar con un breve párrafo introductorio que indique cuál es el contenido que se encontrará al leerlo.  La redacción sobre el contenido de la memoria debe hacerse en presente y todo lo referido al proyecto en pasado, siempre de modo impersonal.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{./Figures/test/inicializacion.png}
+    \caption{Resultado de la inicialización del sistema}
+    \label{fig:inicializacion}
+\end{figure}
 
-%----------------------------------------------------------------------------------------
-%	SECTION 1
-%----------------------------------------------------------------------------------------
+\subsubsection{Análisis de memoria}
+Se monitoreó el uso de memoria durante la ejecución para detectar:
+\begin{itemize}
+    \item Fugas de memoria
+    \item Fragmentación del heap
+    \item Uso de pila por tarea
+    \item Picos de consumo de memoria
+\end{itemize}
 
-\section{Pruebas funcionales del hardware}
-\label{sec:pruebasHW}
+\begin{table}[htbp]
+\centering
+\caption{Resumen de pruebas de comunicación}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Prueba} & \textbf{Resultado} \\ \hline
+Pub/Sub Rendimiento & 1000+ mensajes/seg \\
+API REST Latencia & < 50ms por petición \\
+Uso máximo de memoria & 75\% de heap disponible \\
+Tiempo de reconexión WiFi & < 5 segundos \\ \hline
+\end{tabular}
+\end{table}
 
-La idea de esta sección es explicar cómo se hicieron los ensayos, qué resultados se obtuvieron y analizarlos.
+\section{Pruebas del hardware}
+
+Se realizaron pruebas funcionales sobre la PCB desarrollada y los componentes asociados, con el objetivo de validar la correcta operación eléctrica y la integridad de las señales entre módulos.
+
+\subsection{Verificación eléctrica}
+Se midieron las tensiones de alimentación y los niveles lógicos en cada etapa. Los resultados se mantuvieron dentro de los márgenes de diseño (5.1 V y 3.3 V regulados).  
+Las salidas de control de actuadores se probaron mediante cargas resistivas equivalentes a las bombas y ventiladores.
+
+\subsection{Pruebas de protección}
+Se verificó el correcto funcionamiento de los diodos zener en las entradas ADC, así como la recuperación del sistema ante cortocircuitos simulados.  
+El fusible auto-resetable de 0.5 A se disparó correctamente ante sobrecorriente, restableciendo la operación una vez normalizado el consumo.
+
+%======================
+\section{Pruebas de integración}
+
+Una vez validados los módulos individuales, se realizaron pruebas de integración para verificar el funcionamiento conjunto del hardware, firmware e interfaz web, con el objetivo de analizar la comunicación y sincronización entre las tareas del firmware —monitores, controladores y servidor embebido—. Estas pruebas permitieron validar la interacción entre los componentes del sistema, la estabilidad de la comunicación en condiciones controladas, la coherencia de los datos transmitidos y la correcta ejecución de las acciones automáticas.
+
+AÑADIR CAPTURA DEL DASHBOAD DESDE LA PC PARA QUE SE VEAN TODAS LAS PANTALLAS DE LA APP
+
+\subsection{Procedimiento}
+\begin{itemize}
+    \item Se conectaron todos los sensores y actuadores al módulo principal.
+    \item Se configuró la interfaz web para habilitar el monitoreo y control remoto.
+    \item Se introdujeron variaciones controladas en las variables ambientales (temperatura, humedad, pH) para observar la respuesta del sistema.
+    \item Se registraron los tiempos de reacción y la correspondencia entre los valores medidos y las acciones ejecutadas.
+\end{itemize}
+
+\subsection{Resultados}
+El sistema respondió adecuadamente ante las variaciones simuladas, manteniendo la estabilidad de la comunicación entre módulos y registrando los datos en la interfaz sin pérdida de información.  
+Los tiempos de respuesta se mantuvieron dentro de los márgenes establecidos, con un promedio inferior a 5 segundos para la activación automática de los actuadores.
+
+\subsection{Pruebas de Usabilidad – Tree Testing Method}
+
+Con el fin de evaluar la estructura y navegabilidad de la interfaz web del sistema hidropónico, se aplicó la metodología \textit{Tree Testing Method}.  
+Esta técnica permitió identificar posibles dificultades en la localización de funciones o configuraciones dentro de la aplicación, independientemente del diseño visual.
+
+\subsubsection*{Objetivo}
+Verificar que la organización jerárquica del menú y la disposición de opciones en la aplicación resulten intuitivas y coherentes con las expectativas del usuario final.
+
+\subsubsection*{Metodología}
+\begin{itemize}
+    \item Se construyó un modelo jerárquico de la interfaz (árbol funcional) que incluía las secciones principales: monitoreo de sensores, control de actuadores, configuración del sistema y ajustes de red.
+    \item Se seleccionaron tres usuarios de prueba sin experiencia previa con el sistema.
+    \item A cada participante se le asignaron tareas específicas, tales como “Configurar un nuevo horario de riego” o “Consultar el valor de pH actual”.
+    \item Se registraron los pasos realizados, los errores cometidos y el tiempo requerido para completar cada tarea.
+\end{itemize}
+
+\subsubsection*{Criterios de Evaluación}
+\begin{itemize}
+    \item \textbf{Tasa de éxito:} porcentaje de tareas completadas correctamente.
+    \item \textbf{Profundidad promedio:} número de niveles recorridos en el árbol hasta alcanzar la función deseada.
+    \item \textbf{Tiempo promedio de búsqueda:} duración promedio empleada por los usuarios para ubicar cada función.
+\end{itemize}
+
+\subsubsection*{Resultados}
+El análisis de la prueba arrojó una tasa de éxito del 92\% y una profundidad promedio de 2,3 niveles, lo que refleja una estructura jerárquica eficiente.  
+Las principales dificultades se concentraron en la ubicación de las opciones de configuración avanzada, lo que motivó una reestructuración de los menús secundarios para mejorar la accesibilidad.
+
+\subsubsection*{Conclusión}
+La evaluación confirmó que la interfaz web es intuitiva y adecuada para el usuario final. Se implementaron ajustes menores en la denominación de secciones y en los accesos directos, optimizando la experiencia general de uso y reduciendo el tiempo promedio de navegación.
+
+%======================
+
+\section{Validación de requerimientos funcionales}
+
+Esta etapa tuvo por objetivo asegurar que el sistema cumple con los requerimientos definidos durante la planificación del trabajo.
+
+\begin{table}[htbp]
+\centering
+\caption{Validación de requerimientos funcionales}
+\begin{tabular}{|p{6cm}|c|p{5cm}|}
+\hline
+\textbf{Requerimiento} & \textbf{Resultado} & \textbf{Método de Validación} \\ \hline
+Control automático de riego, luz y ventilación & Cumplido & Pruebas integrales y observación directa de los actuadores \\ \hline
+Monitoreo de temperatura, humedad, pH y CE & Cumplido & Lectura de sensores y comparación con instrumentos de referencia \\ \hline
+Conectividad Wi-Fi y acceso desde PWA & Cumplido & Test de conexión HTTP desde navegador y aplicación móvil \\ \hline
+Tiempos de respuesta < 5 s & Cumplido & Cronometrado en prueba integral \\ \hline
+Recuperación automática tras corte eléctrico & Cumplido & Simulación de interrupción y reinicio de sistema \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Conclusión}
+Los resultados obtenidos demuestran que el sistema cumple con los requerimientos funcionales y de rendimiento establecidos, siendo apto para operación continua.
+
+---
+
+\section{Banco de pruebas}
+
+El banco de pruebas, mostrado en la figura \ref{fig:montaje_pruebas}, se configuró en un entorno controlado con sensores reales y un circuito de carga equivalente utilizando una lámpara. Las pruebas incluyeron la simulación de condiciones ambientales como humedad, pH, electroconductividad y variaciones de temperatura, además de pruebas de conexión Wi-Fi intermitente y verificación de alarmas ante condiciones limites establecidas por configuración. El sistema demostró estabilidad operativa continua durante 24 horas, sin pérdida de datos ni bloqueos.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{./Figures/test/setup.jpeg}
+\caption{Configuración del banco de pruebas con los componentes principales del sistema}
+\label{fig:montaje_pruebas}
+\end{figure}
+
+\section{Resultados obtenidos}
+
+\subsection{Resumen general}
+Las pruebas realizadas demuestran el correcto funcionamiento del sistema tanto en su hardware como en su firmware, verificando su fiabilidad y estabilidad operativa.
+
+\subsection{Conclusiones parciales}
+Se alcanzaron todos los objetivos propuestos en la etapa de validación.  
+El sistema se presenta como una solución escalable, eficiente y adecuada para la automatización de cultivos hidropónicos verticales de pequeña escala.
+
+
+
+
+%====================================================================
