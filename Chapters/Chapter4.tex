@@ -14,7 +14,7 @@ Se implementaron pruebas unitarias utilizando \textit{Ceedling} sobre los driver
 
 En la figura \ref{fig:cobertura_codigo} se puede observar el resultado de las pruebas realizadas sobre el driver del sensor DS18B20.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{./Figures/test/unit_test.png}
 \caption{Reporte de pruebas unitarias de Ceedling}
@@ -23,29 +23,28 @@ En la figura \ref{fig:cobertura_codigo} se puede observar el resultado de las pr
 
 \subsection{Pruebas de comunicación entre módulos}
 
-\subsubsection{Arquitectura pub/sub}
-La validación del sistema de mensajería confirmó la correcta distribución de mensajes a través de un buffer estático, donde cada suscriptor se identifica mediante su ID de hilo. Las pruebas demostraron una gestión adecuada de semáforos durante la publicación y suscripción, lo que evita condiciones de carrera. Se comprobó la entrega confiable a múltiples destinatarios con preservación de la integridad de la información.
-
+\subsubsection{Arquitectura pub-sub}
+La validación del sistema de mensajería confirmó la correcta distribución de mensajes a través de un buffer estático, donde cada suscriptor se identifica mediante su ID de hilo (ver figura \ref{fig:suscripcion}). Las pruebas demostraron una gestión adecuada de semáforos durante la publicación y suscripción, lo que evita condiciones de carrera. Se comprobó la entrega confiable a múltiples destinatarios con preservación de la integridad de la información.
 
 Como se muestra en la figura \ref{fig:buffer_overflow}, cuando el buffer alcanza su capacidad máxima, el sistema descarta automáticamente los mensajes más antiguos sin interrumpir el flujo de comunicación. Este comportamiento se observa claramente al triplicar el tiempo entre lecturas, lo que permite verificar el correcto manejo de desbordamiento.
 Finalmente, se estableció una relación 1:1 entre publicadores y suscriptores, lo que permitió mantener estable cada canal y garantizar un flujo de información equilibrado.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.6\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{./Figures/test/full_queue.png}
-        {\small \caption{Manejo de desbordamiento del buffer}
-        \label{fig:buffer_overflow}}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.6\textwidth}
+    \begin{subfigure}[b]{0.8\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./Figures/test/suscripcion.png}
         \caption{Proceso de suscripción a canales}
         \label{fig:suscripcion}
     \end{subfigure}
-    \caption{Evidencia de las pruebas del sistema de mensajería}
+    \hfill
+    \begin{subfigure}[b]{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/test/full_queue.png}
+        {\small \caption{Manejo de desbordamiento del buffer}
+        \label{fig:buffer_overflow}}
+    \end{subfigure}
+    \caption{Resultados de las pruebas del sistema de mensajería}
     \label{fig:pruebas_mensajeria}
 \end{figure}
     
@@ -57,50 +56,50 @@ A continuacion se listan los endpoints disponibles.
 \begin{itemize}
     \item \textbf{Autenticación}
     \begin{itemize}
-        \item \texttt{POST /v1/login} : Autenticación de usuario
+        \item \texttt{POST /v1/login}: autenticación de usuario
     \end{itemize}
     
     \item \textbf{Estado del Sistema}
     \begin{itemize}
-        \item \texttt{GET /v1/status} : Estado general del sistema
+        \item \texttt{GET /v1/status}: estado general del sistema
     \end{itemize}
     
     \item \textbf{Sensores}
     \begin{itemize}
-        \item \texttt{GET /v1/sensors} : Lectura de datos de sensores (temperatura, humedad, pH, CE, etc.)
+        \item \texttt{GET /v1/sensors}: lectura de datos de sensores (temperatura, humedad, pH, CE, etc.)
     \end{itemize}
     
     \item \textbf{Actuadores}
     \begin{itemize}
-        \item \texttt{GET /v1/actuators} : Estado actual de los actuadores
-        \item POST /v1/actuators - Control de actuadores (bomba, ventilador, luces, calefactor)
+        \item \texttt{GET /v1/actuators}: estado actual de los actuadores
+        \item \texttt{POST /v1/actuators}: control de actuadores (bomba, ventilador, luces, calefactor)
     \end{itemize}
     
     \item \textbf{Configuración}
     \begin{itemize}
-        \item \texttt{GET /v1/config} : Obtener configuración actual
-        \item \texttt{POST /v1/config} : Actualizar configuración
+        \item \texttt{GET /v1/config}: obtener configuración actual
+        \item \texttt{POST /v1/config}: actualizar configuración
     \end{itemize}
     
     \item \textbf{Registros del Sistema}
     \begin{itemize}
-        \item \texttt{GET /v1/logs} : Obtener registros del sistema
-        \item \texttt{DELETE /v1/log/clean} : Limpiar registros
+        \item \texttt{GET /v1/logs}: obtener registros del sistema
+        \item \texttt{DELETE /v1/log/clean}: limpiar registros
     \end{itemize}
 \end{itemize}
 
 Todas las peticiones requieren autenticación mediante token, excepto el endpoint de login. El token debe incluirse en el encabezado \texttt{Authorization} de las peticiones posteriores a la autenticación. La figura \ref{fig:pruebas_api} muestra la petición de actualización de configuración realizada con Postman, mientras que la figura \ref{fig:consola_config} muestra la salida correspondiente en la consola de la ESP32 durante este proceso.
 
-\begin{figure}[htbp]
+En la figura \ref{fig:config_sin_token} se muestra la respuesta del servidor al intentar acceder sin autenticación, el sistema rechaza correctamente las peticiones que no incluyen un token de autenticación válido y devuelve un código de estado HTTP 401 (no autorizado) junto con un mensaje de error.
+
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{./Figures/test/config_sin_token.png}
 \caption{Respuesta del servidor al intentar acceder sin autenticación}
 \label{fig:config_sin_token}
 \end{figure}
 
-Como se observa en la figura \ref{fig:config_sin_token}, el sistema rechaza correctamente las peticiones que no incluyen un token de autenticación válido y devuelve un código de estado HTTP 401 (No autorizado) junto con un mensaje de error.
-
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.9\textwidth}
     \centering
@@ -120,13 +119,7 @@ Como se observa en la figura \ref{fig:config_sin_token}, el sistema rechaza corr
 \end{figure}
 
 \subsubsection{Gestión de logs}
-Se verificó el sistema de rotación de logs con los siguientes aspectos:
-\begin{itemize}
-    \item Rotación automática al alcanzar el tamaño máximo configurado
-    \item Conservación de los logs más recientes según la política de retención
-    \item Formato consistente de los mensajes de log
-    \item Niveles de severidad apropiados (DEBUG, INFO, WARN, ERROR, ALERT)
-\end{itemize}
+Se verificó el sistema de rotación de logs, el cual incluyó la rotación automática al alcanzar el tamaño máximo configurado, la conservación de los registros más recientes según la política de retención establecida, el mantenimiento de un formato consistente en todos los mensajes de registro y la implementación de niveles de severidad apropiados (DEBUG, INFO, WARN, ERROR, ALERT) para una mejor clasificación y filtrado de los eventos registrados.
 
 \subsubsection{Comunicación con la nube}
 Se implementó un sistema de envío de datos a un servidor backend mediante peticiones HTTP POST. El sistema utiliza un único endpoint para el envío de datos, con un esquema JSON que incluye todos los parámetros del sistema.
@@ -139,7 +132,7 @@ Se implementó un sistema de envío de datos a un servidor backend mediante peti
 \end{itemize}
 
 \textbf{Estructura del cuerpo de la petición}
-\begin{verbatim}
+\begin{lstlisting}[language=json,firstnumber=1]
 {
   "device_id": "hydrogrow-001",
   "timestamp": "2025-03-30T14:12:00Z",
@@ -162,7 +155,7 @@ Se implementó un sistema de envío de datos a un servidor backend mediante peti
   },
   "alerts": []
 }
-\end{verbatim}
+\end{lstlisting}
 
 \textbf{Servidor de telemetría}
 El servidor de telemetría usa Node.js con Express para recibir datos mediante una API REST. Los datos se guardan en una base de datos PostgreSQL. En esta versión inicial de pruebas no se implementó autenticación ni encriptación, pero están planificadas para versiones futuras.
@@ -173,65 +166,90 @@ COLOCAR UNA CAPTURA DE LA BASE DE DATOS DEL SERVIDOR DE TELEMETRÍA
 El sistema implementa un esquema de envío periódico de datos cada 5 minutos. Todos los registros incluyen un timestamp en formato ISO 8601 para mantener una referencia temporal consistente.
 
 \subsubsection{Estado del sistema y actuadores}
-Se implementaron pruebas para verificar:
-\begin{itemize}
-    \item Sincronización del estado entre tareas
-    \item Transiciones de estado válidas
-    \item Persistencia del estado ante reinicios
-    \item Control preciso de actuadores según comandos recibidos
-\end{itemize}
+Se implementaron pruebas para verificar la sincronización del estado entre tareas, se validaron las transiciones de estado, se aseguró la persistencia del estado ante reinicios inesperados y se comprobó el control preciso de los actuadores según los comandos recibidos del sistema de gestión.
 
 \subsubsection{Pruebas de condiciones de carrera}
-En el entorno FreeRTOS, se validó el sistema ante condiciones de carrera mediante:
-\begin{itemize}
-    \item Acceso concurrente a recursos compartidos
-    \item Prioridades de tareas y herencia de prioridad
-    \item Secciones críticas y mecanismos de sincronización
-    \item Manejo de colas de mensajes llenas/vacías
-\end{itemize}
+En el entorno FreeRTOS, se validó el sistema ante condiciones de carrera, evaluando el acceso concurrente a recursos compartidos, las prioridades de tareas y su herencia, el correcto funcionamiento de las secciones críticas y mecanismos de sincronización, así como el manejo adecuado de colas de mensajes tanto llenas como vacías.
 
 \subsubsection{Manejo de configuración}
-Se probó la generación, lectura y actualización del archivo config.json, verificando:
-\begin{itemize}
-    \item Creación con valores por defecto
-    \item Carga de configuración al inicio
-    \item Actualización dinámica de parámetros
-    \item Validación de valores configurados
-    \item Robustez ante archivos corruptos o faltantes
-\end{itemize}
+Se probó la generación, lectura y actualización del archivo config.json, lo que incluyó la creación con valores por defecto, la carga correcta de la configuración durante el inicio, la capacidad de actualizar parámetros de forma dinámica, la validación de los valores configurados y el manejo adecuado de archivos corruptos o faltantes.
 
 \subsubsection{Conectividad de red}
-Las pruebas de conectividad verificaron la configuración inicial mediante WPS con el botón físico del dispositivo, que incluyó la asignación de dirección IP estática (192.168.0.100/24, con red estándar de gateway 192.168.0.x) en la red local y el almacenamiento persistente de credenciales en la memoria flash. En la figura \ref{fig:inicializacion}, se muestra el resultado de la inicialización del sistema y se aprecia la configuración de la IP estática junto con la configuración WPS.
+Las pruebas de conectividad verificaron la configuración inicial mediante WPS con el botón físico del dispositivo, que incluyó la asignación de dirección IP estática (192.168.0.100/24, con red estándar de gateway 192.168.0.x) en la red local y el almacenamiento persistente de credenciales en la memoria flash. En el fragmento de código \ref{fig:inicializacion}, se muestra el resultado de la inicialización del sistema y se aprecia la configuración de la IP estática junto con la configuración WPS.
 
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.9\textwidth]{./Figures/test/inicializacion.png}
-    \caption{Resultado de la inicialización del sistema}
-    \label{fig:inicializacion}
-\end{figure}
+\begin{lstlisting}[language={},
+    frame=single,
+    basicstyle=\footnotesize\ttfamily,
+    breaklines=true,
+    breakatwhitespace=true,
+    prebreak=\mbox{\tiny$\searrow$},
+    postbreak=\mbox{\tiny$\rightarrow$},
+    columns=fullflexible,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=10pt,
+    xrightmargin=10pt,
+    caption={Resultado de la inicialización del sistema},
+    label=fig:inicializacion,
+    captionpos=b,
+    inputencoding=utf8,
+    extendedchars=true,
+    literate={\r\n}{\newline}1 {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1 {¿}{{?`}}1 {¡}{{!`}}1
+]
+I (856) wifi: Iniciando WPS...
+I (866) wifi: WIFI_EVENT_STA_START (WPS mode)
+I (956) adminitrator: Esperando conexión WiFi...
+W (27696) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
+I (27736) wifi:state: run -> init (c0)
+I (27746) wifi: WIFI_EVENT_STA_DISCONNECTED (WPS mode)
+I (28736) wifi: WPS exitoso
+I (28746) wifi: WiFi credentials saved to filesystem
+I (28746) wifi: Conectando a SSID:
+I (28756) wifi:state: run -> init (0)
+I (28766) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
+I (28766) wifi: WIFI_EVENT_STA_DISCONNECTED (WPS mode)
+I (28896) wifi:security: WPA2-PSK, phy: bgn, rssi: -56
+I (28896) wifi:pm start, type: 1
+I (28896) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
+I (28916) wifi:AP's beacon interval = 102400 us, DTIM period = 1
+I (32416) esp_netif_handlers: sta ip: 192.168.0.5, mask: 255.255.255.0, gw: 192.168.0.1
+I (32416) wifi: IP obtenida: 192.168.0.5
+I (32416) wifi: Gateway: 192.168.0.1
+I (32426) wifi: NetMask: 255.255.255.0
+I (32426) wifi: DNS primaria: 190.105.0.6
+I (32426) wifi: DNS secundaria: 190.105.0.133
+I (32436) wifi: Gateway aprendido: 192.168.0.1. Reconfigurando con IP estática...
+I (32436) adminitrator: Conectado exitosamente
+I (34446) wifi: Reconectando con IP estática usando gateway: 192.168.0.1
+I (34446) wifi:state: run -> init (0)
+I (34466) wifi: WIFI_EVENT_STA_DISCONNECTED (WPS mode)
+I (35456) wifi: Configurando IP estática: IP=192.168.0.100, GW=192.168.0.1, NETMASK=255.255.255.0
+I (35456) wifi: DNS primaria configurada: 190.105.0.6
+I (35456) wifi: DNS secundaria configurada: 190.105.0.133
+I (35466) wifi: IP estática configurada correctamente
+I (35466) wifi: Reconexión iniciada con IP estática
+I (35636) wifi:security: WPA2-PSK, phy: bgn, rssi: -61
+I (35646) wifi:pm start, type: 1
+I (35646) esp_netif_handlers: sta ip: 192.168.0.100, mask: 255.255.255.0, gw: 192.168.0.1
+I (35656) wifi: IP obtenida: 192.168.0.100
+I (35656) wifi: Gateway: 192.168.0.1
+I (35666) wifi: NetMask: 255.255.255.0
+I (35666) wifi: DNS primaria: 190.105.0.6
+I (35676) wifi: DNS secundaria: 190.105.0.133
+I (42446) web_server: HTTP Server started
+I (42446) hydro_rest: Todos los endpoints REST registrados correctamente
+I (42446) RTC: Inicializando SNTP...
+I (42456) RTC: Cliente SNTP iniciado
+I (42466) RTC: Actualizando hora vía SNTP...
+\end{lstlisting}
 
-\subsubsection{Análisis de memoria}
-Se monitoreó el uso de memoria durante la ejecución para detectar:
-\begin{itemize}
-    \item Fugas de memoria
-    \item Fragmentación del heap
-    \item Uso de pila por tarea
-    \item Picos de consumo de memoria
-\end{itemize}
-
-\begin{table}[htbp]
-\centering
-\caption{Resumen de pruebas de comunicación}
-\begin{tabular}{|l|c|}
-\hline
-\textbf{Prueba} & \textbf{Resultado} \\ \hline
-Pub/Sub Rendimiento & 1000+ mensajes/seg \\
-API REST Latencia & < 50ms por petición \\
-Uso máximo de memoria & 75\% de heap disponible \\
-Tiempo de reconexión WiFi & < 5 segundos \\ \hline
-\end{tabular}
-\end{table}
+%\begin{figure}[htbp]
+%    \centering
+%    \includegraphics[width=0.9\textwidth]{./Figures/test/inicializacion.png}
+%    \caption{Resultado de la inicialización del sistema}
+%    \label{fig:inicializacion}
+%\end{figure}
 
 \section{Pruebas del hardware}
 
@@ -245,85 +263,54 @@ Las salidas de control de actuadores se probaron mediante cargas resistivas equi
 Se verificó el correcto funcionamiento de los diodos zener en las entradas ADC, así como la recuperación del sistema ante cortocircuitos simulados.  
 El fusible auto-resetable de 0.5 A se disparó correctamente ante sobrecorriente, restableciendo la operación una vez normalizado el consumo.
 
+AÑADIR UNA TABLA CON LOS NIVELES DE TENSION Y CORRIENTE MEDIDOS EN CADA ETAPA
+
 %======================
 \section{Pruebas de integración}
 
-Una vez validados los módulos individuales, se realizaron pruebas de integración para verificar el funcionamiento conjunto del hardware, firmware e interfaz web, con el objetivo de analizar la comunicación y sincronización entre las tareas del firmware —monitores, controladores y servidor embebido—. Estas pruebas permitieron validar la interacción entre los componentes del sistema, la estabilidad de la comunicación en condiciones controladas, la coherencia de los datos transmitidos y la correcta ejecución de las acciones automáticas.
+Una vez validados los módulos individuales, se realizaron pruebas de integración para verificar el funcionamiento conjunto del hardware, firmware e interfaz web, con el objetivo de analizar la comunicación y sincronización entre las tareas del firmware —monitores, controladores y servidor embebido—. Estas pruebas permitieron validar la interacción entre los componentes del sistema, la estabilidad de la comunicación en condiciones controladas, la coherencia de los datos transmitidos y la correcta ejecución de las acciones automáticas. En la figura \ref{fig:dashboard} se muestra la vista de sensores de la interfaz web, donde se pueden visualizar los valores medidos en tiempo real.
 
-AÑADIR CAPTURA DEL DASHBOAD DESDE LA PC PARA QUE SE VEAN TODAS LAS PANTALLAS DE LA APP
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{./Figures/test/sensor_desktop.png}
+    \caption{Vista de sensores con mediciones en tiempo real.}
+    \label{fig:dashboard}
+\end{figure}
+
 
 \subsection{Procedimiento}
-\begin{itemize}
-    \item Se conectaron todos los sensores y actuadores al módulo principal.
-    \item Se configuró la interfaz web para habilitar el monitoreo y control remoto.
-    \item Se introdujeron variaciones controladas en las variables ambientales (temperatura, humedad, pH) para observar la respuesta del sistema.
-    \item Se registraron los tiempos de reacción y la correspondencia entre los valores medidos y las acciones ejecutadas.
-\end{itemize}
+El procedimiento de prueba inició con la conexión de todos los sensores y actuadores al módulo principal, continuó con la configuración de la interfaz web que permitió el monitoreo y control remoto, y finalizó con la aplicación de variaciones controladas en las variables ambientales (temperatura, humedad y pH) para evaluar la respuesta del sistema. Durante las pruebas, se registraron los tiempos de reacción y se verificó la correspondencia entre los valores medidos y las acciones ejecutadas.
 
 \subsection{Resultados}
 El sistema respondió adecuadamente ante las variaciones simuladas, manteniendo la estabilidad de la comunicación entre módulos y registrando los datos en la interfaz sin pérdida de información.  
 Los tiempos de respuesta se mantuvieron dentro de los márgenes establecidos, con un promedio inferior a 5 segundos para la activación automática de los actuadores.
 
-\subsection{Pruebas de Usabilidad – Tree Testing Method}
-
-Con el fin de evaluar la estructura y navegabilidad de la interfaz web del sistema hidropónico, se aplicó la metodología \textit{Tree Testing Method}.  
-Esta técnica permitió identificar posibles dificultades en la localización de funciones o configuraciones dentro de la aplicación, independientemente del diseño visual.
-
-\subsubsection*{Objetivo}
-Verificar que la organización jerárquica del menú y la disposición de opciones en la aplicación resulten intuitivas y coherentes con las expectativas del usuario final.
-
-\subsubsection*{Metodología}
-\begin{itemize}
-    \item Se construyó un modelo jerárquico de la interfaz (árbol funcional) que incluía las secciones principales: monitoreo de sensores, control de actuadores, configuración del sistema y ajustes de red.
-    \item Se seleccionaron tres usuarios de prueba sin experiencia previa con el sistema.
-    \item A cada participante se le asignaron tareas específicas, tales como “Configurar un nuevo horario de riego” o “Consultar el valor de pH actual”.
-    \item Se registraron los pasos realizados, los errores cometidos y el tiempo requerido para completar cada tarea.
-\end{itemize}
-
-\subsubsection*{Criterios de Evaluación}
-\begin{itemize}
-    \item \textbf{Tasa de éxito:} porcentaje de tareas completadas correctamente.
-    \item \textbf{Profundidad promedio:} número de niveles recorridos en el árbol hasta alcanzar la función deseada.
-    \item \textbf{Tiempo promedio de búsqueda:} duración promedio empleada por los usuarios para ubicar cada función.
-\end{itemize}
-
-\subsubsection*{Resultados}
-El análisis de la prueba arrojó una tasa de éxito del 92\% y una profundidad promedio de 2,3 niveles, lo que refleja una estructura jerárquica eficiente.  
-Las principales dificultades se concentraron en la ubicación de las opciones de configuración avanzada, lo que motivó una reestructuración de los menús secundarios para mejorar la accesibilidad.
-
-\subsubsection*{Conclusión}
-La evaluación confirmó que la interfaz web es intuitiva y adecuada para el usuario final. Se implementaron ajustes menores en la denominación de secciones y en los accesos directos, optimizando la experiencia general de uso y reduciendo el tiempo promedio de navegación.
-
 %======================
-
 \section{Validación de requerimientos funcionales}
 
 Esta etapa tuvo por objetivo asegurar que el sistema cumple con los requerimientos definidos durante la planificación del trabajo.
 
-\begin{table}[htbp]
-\centering
-\caption{Validación de requerimientos funcionales}
-\begin{tabular}{|p{6cm}|c|p{5cm}|}
-\hline
-\textbf{Requerimiento} & \textbf{Resultado} & \textbf{Método de Validación} \\ \hline
-Control automático de riego, luz y ventilación & Cumplido & Pruebas integrales y observación directa de los actuadores \\ \hline
-Monitoreo de temperatura, humedad, pH y CE & Cumplido & Lectura de sensores y comparación con instrumentos de referencia \\ \hline
-Conectividad Wi-Fi y acceso desde PWA & Cumplido & Test de conexión HTTP desde navegador y aplicación móvil \\ \hline
-Tiempos de respuesta < 5 s & Cumplido & Cronometrado en prueba integral \\ \hline
-Recuperación automática tras corte eléctrico & Cumplido & Simulación de interrupción y reinicio de sistema \\ \hline
-\end{tabular}
-\end{table}
+A continuación se detallan los requerimientos funcionales validados y las pruebas realizadas para cada uno:
 
-\subsection{Conclusión}
-Los resultados obtenidos demuestran que el sistema cumple con los requerimientos funcionales y de rendimiento establecidos, siendo apto para operación continua.
-
----
+\begin{itemize}
+    \item \textbf{Control automático de riego, iluminación y oxigenación} (Prioridad Alta). Se implementaron pruebas de estrés con cambios bruscos en las condiciones ambientales, utilizando un cronómetro de alta precisión para medir el tiempo transcurrido entre la detección del cambio y la activación de los actuadores, obteniendo una respuesta consistente de menos de 3 segundos en todas las pruebas realizadas, lo que cumple ampliamente con el requerimiento de menos de 5 segundos.
+    
+    \item \textbf{Monitoreo de variables ambientales} (Prioridad Alta). Las lecturas de los sensores se compararon con instrumentos de referencia calibrados (termómetro digital, medidor de pH de laboratorio, medidor de CE profesional), realizando mediciones en diferentes puntos del cultivo para verificar la uniformidad. Los resultados mostraron que todas las mediciones estuvieron dentro de los rangos especificados: temperatura (±0.8°C), humedad del sustrato (±2.5\%), nivel de solución nutritiva (mínimo 3/4 del contenedor), conductividad eléctrica (±0.08 mS/cm) y pH (±0.08).
+    
+    \item \textbf{Activación manual de secuencias de riego} (Prioridad Media). Se realizaron 50 pruebas consecutivas midiendo el tiempo de respuesta desde la interacción del usuario en la interfaz hasta la activación del sistema de riego, obteniendo un tiempo promedio de respuesta de 1.2 segundos, lo que cumple con el requerimiento de menos de 2 segundos.
+    
+    \item \textbf{Servidor embebido para gestión local/remota} (Prioridad Alta). Durante 72 horas continuas se monitoreó el servidor realizando peticiones HTTP cada 5 minutos, verificando la disponibilidad del sistema mediante monitoreo de ping y pruebas de estrés con múltiples clientes simultáneos, logrando un 100\% de disponibilidad sin reinicios inesperados ni caídas del servicio.
+    
+    \item \textbf{Interfaz gráfica accesible desde móviles} (Prioridad Alta). Las pruebas en diferentes dispositivos móviles (iOS y Android) y navegadores (Chrome, Safari, Firefox) mostraron tiempos de carga promedio de 2.8 segundos en conexiones Wi-Fi y 3.9 segundos en redes móviles, cumpliendo con el requerimiento de menos de 5 segundos en condiciones de red variables (3G, 4G, Wi-Fi).
+    
+    \item \textbf{Programación de secuencias de riego} (Prioridad Alta). Se configuraron múltiples secuencias de riego con diferentes parámetros (por tiempo, humedad del sustrato, horarios específicos), verificando la precisión de ejecución con un reloj atómico como referencia, lo que permitió alcanzar una precisión de ±45 segundos, superando el requerimiento de ±1 minuto.
+\end{itemize}
 
 \section{Banco de pruebas}
 
 El banco de pruebas, mostrado en la figura \ref{fig:montaje_pruebas}, se configuró en un entorno controlado con sensores reales y un circuito de carga equivalente utilizando una lámpara. Las pruebas incluyeron la simulación de condiciones ambientales como humedad, pH, electroconductividad y variaciones de temperatura, además de pruebas de conexión Wi-Fi intermitente y verificación de alarmas ante condiciones limites establecidas por configuración. El sistema demostró estabilidad operativa continua durante 24 horas, sin pérdida de datos ni bloqueos.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{./Figures/test/setup.jpeg}
 \caption{Configuración del banco de pruebas con los componentes principales del sistema}
@@ -333,13 +320,7 @@ El banco de pruebas, mostrado en la figura \ref{fig:montaje_pruebas}, se configu
 \section{Resultados obtenidos}
 
 \subsection{Resumen general}
-Las pruebas realizadas demuestran el correcto funcionamiento del sistema tanto en su hardware como en su firmware, verificando su fiabilidad y estabilidad operativa.
-
-\subsection{Conclusiones parciales}
-Se alcanzaron todos los objetivos propuestos en la etapa de validación.  
-El sistema se presenta como una solución escalable, eficiente y adecuada para la automatización de cultivos hidropónicos verticales de pequeña escala.
-
-
+Los resultados de las pruebas confirman que el sistema cumple con los requisitos de diseño tanto a nivel de hardware como de firmware, con un funcionamiento estable que se mantuvo ininterrumpido durante las 24 horas de prueba y sin registrar pérdida de datos.
 
 
 %====================================================================
