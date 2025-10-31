@@ -31,14 +31,14 @@ Finalmente, se estableció una relación 1:1 entre publicadores y suscriptores, 
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.8\textwidth}
+    \begin{subfigure}[b]{1.0\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./Figures/test/suscripcion.png}
         \caption{Proceso de suscripción a canales}
         \label{fig:suscripcion}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.8\textwidth}
+    \begin{subfigure}[b]{1.0\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./Figures/test/full_queue.png}
         {\small \caption{Manejo de desbordamiento del buffer}
@@ -101,14 +101,14 @@ En la figura \ref{fig:config_sin_token} se muestra la respuesta del servidor al 
 
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.9\textwidth}
+\begin{subfigure}[b]{1.0\textwidth}
     \centering
     \includegraphics[width=\textwidth]{./Figures/test/config_postman.png}
     \caption{Pruebas de API con Postman - actualización de la configuración}
     \label{fig:pruebas_api}
 \end{subfigure}
 \hfill
-\begin{subfigure}[b]{0.9\textwidth}
+\begin{subfigure}[b]{1.0\textwidth}
     \centering
     \includegraphics[width=\textwidth]{./Figures/test/update_config.png}
     \caption{Salida por consola durante la actualización de la configuración}
@@ -132,7 +132,7 @@ Se implementó un sistema de envío de datos a un servidor backend mediante peti
 \end{itemize}
 
 \textbf{Estructura del cuerpo de la petición}
-\begin{lstlisting}[language=json,firstnumber=1]
+\begin{verbatim}
 {
   "device_id": "hydrogrow-001",
   "timestamp": "2025-03-30T14:12:00Z",
@@ -155,7 +155,7 @@ Se implementó un sistema de envío de datos a un servidor backend mediante peti
   },
   "alerts": []
 }
-\end{lstlisting}
+\end{verbatim}
 
 \textbf{Servidor de telemetría}
 El servidor de telemetría usa Node.js con Express para recibir datos mediante una API REST. Los datos se guardan en una base de datos PostgreSQL. En esta versión inicial de pruebas no se implementó autenticación ni encriptación, pero están planificadas para versiones futuras.
