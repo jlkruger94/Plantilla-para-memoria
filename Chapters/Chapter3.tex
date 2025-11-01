@@ -138,6 +138,13 @@ Una vez establecida la conexión, se inicia el servidor embebido y se habilita l
 \subsection{Estructura del código}
 La arquitectura sigue el patrón modular con módulos de software que ejecutan tareas de forma ordenada. El ciclo comienza en \texttt{main.c} con la inicialización del sistema a través del componente \texttt{Administrator}, como se detalla en la figura \ref{fig:flujo:sistema}.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.4]{./Figures/FLujo-sistema.png}
+        \caption{Diagrama simplificado del ciclo de ejecución del programa.}
+        \label{fig:flujo:sistema}
+    \end{figure}
+
 \subsubsection*{Inicialización del sistema}
 La función \texttt{app\_main()} crea la tarea \texttt{administrator\_callback} con alta prioridad, que actúa como un coordinador general que gestiona la interacción entre módulos y subsistemas.
 
@@ -177,12 +184,6 @@ El sistema utiliza un mecanismo de \textit{publish/subscribe} (\texttt{pub\_sub.
 \subsubsection*{Bucle principal de control}
 Una vez inicializado, el \texttt{Administrator} ejecuta un bucle principal de un segundo que realiza las funciones detalladas en la figura \ref{fig:flujo:sistema}:
 
-\begin{figure}[H]
-\centering
-\includegraphics[scale=.4]{./Figures/FLujo-sistema.png}
-    \caption{Diagrama simplificado del ciclo de ejecución del programa.}
-    \label{fig:flujo:sistema}
-\end{figure}
 
 \begin{itemize}
     \item Lee datos publicados por sensores.
@@ -269,8 +270,6 @@ El diseño del PCB se basa en principios prácticos de diseño electrónico. Se 
 
 La disposición de componentes sigue una estrategia de flujo de señal lógico, con el microcontrolador ubicado en el centro y los conectores de sensores en los bordes para facilitar el cableado, como se puede observar en la figura \ref{fig:montaje}. Los reguladores de tensión se colocaron cerca de sus cargas correspondientes para minimizar la caída de potencial en las pistas. Los capacitores de desacoplo se ubicaron adyacentes a cada pin de alimentación del microcontrolador para filtrar ruido de alta frecuencia.
 
-El ensamblado se realizó de manera manual en un entorno controlado con temperatura y humedad estables. Todos los componentes se soldaron manualmente con cautín utilizando soldadura con plomo (60/40). Se aplicaron medidas de protección ESD durante todo el proceso y se realizó inspección visual y con lupa para verificar la calidad de las uniones soldadas.
-
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.40\textwidth}
@@ -297,6 +296,8 @@ El ensamblado se realizó de manera manual en un entorno controlado con temperat
     \caption{Vistas del circuito impreso (PCB) del sistema.}
     \label{fig:montaje}
 \end{figure}
+
+El ensamblado se realizó de manera manual en un entorno controlado con temperatura y humedad estables. Todos los componentes se soldaron manualmente con cautín utilizando soldadura con plomo (60/40). Se aplicaron medidas de protección ESD durante todo el proceso y se realizó inspección visual y con lupa para verificar la calidad de las uniones soldadas.
 
 \subsection{Pruebas y validación}
 % Describir pruebas de continuidad, consumo, funcionamiento de sensores, etc.
@@ -377,7 +378,7 @@ Para garantizar la seguridad de las comunicaciones, implementa un mecanismo de a
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\textwidth]{./Figures/captures/login.jpeg}
+    \includegraphics[width=0.3\textwidth]{./Figures/captures/login.jpeg}
     \caption{Interfaz de login.}
     \label{fig:login}
 \end{figure}
@@ -417,9 +418,9 @@ Adicionalmente, se muestra un gráfico que representa la evolución de los valor
 % Describir cómo el usuario controla actuadores o configuraciones.
 En esta vista, el usuario tiene la capacidad de activar o desactivar manualmente los actuadores, como la bomba de riego, la iluminación y la ventilación, mientras visualiza el estado actual de cada uno de ellos (ver figura \ref{fig:actuadores}). Las acciones se transmiten al backend embebido mediante solicitudes \texttt{POST} y \texttt{GET} a los endpoints correspondientes.
 
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\textwidth]{./Figures/captures/actuadores.jpeg}
+    \includegraphics[width=0.3\textwidth]{./Figures/captures/actuadores.jpeg}
     \caption{Vista de control de actuadores.}
     \label{fig:actuadores}
 \end{figure}
@@ -430,14 +431,14 @@ El panel de configuración permite modificar umbrales de alarma, períodos de ri
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.4\textwidth}
+    \begin{subfigure}[b]{0.3\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./Figures/captures/config_1.jpeg}
         \caption{Vista inicial de la sección de configuración.}
         \label{fig:configuracion_a}
     \end{subfigure}
     \vspace{1em}
-    \begin{subfigure}[b]{0.4\textwidth}
+    \begin{subfigure}[b]{0.3\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./Figures/captures/config_2.jpeg}
         \caption{Vista final de la sección de configuración.}
@@ -453,7 +454,7 @@ Por ultimo, el panel de logs muestra los eventos relevantes del sistema, como er
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\textwidth]{./Figures/captures/logs.jpeg}
+    \includegraphics[width=0.3\textwidth]{./Figures/captures/logs.jpeg}
     \caption{Logs del sistema.}
     \label{fig:logs}
 \end{figure}
