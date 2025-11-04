@@ -1,42 +1,80 @@
-% Chapter Template
+\chapter{Conclusiones}
 
-\chapter{Conclusiones} % Main chapter title
+\label{Chapter5}
 
-\label{Chapter5} % Change X to a consecutive number; for referencing this chapter elsewhere, use \ref{ChapterX}
-Todos los capítulos deben comenzar con un breve párrafo introductorio que indique cuál es el contenido que se encontrará al leerlo.  La redacción sobre el contenido de la memoria debe hacerse en presente y todo lo referido al proyecto en pasado, siempre de modo impersonal.
+En el presente capítulo se presentan los resultados obtenidos sobre el trabajo realizado, las herramientas y conocimientos adquiridos durante el desarrollo, y se proponen mejoras para futuras versiones del sistema. Además, se destacan las competencias académicas aplicadas durante la implementación del proyecto.
 
+\section{Resultados obtenidos}
 
-%----------------------------------------------------------------------------------------
-
-%----------------------------------------------------------------------------------------
-%	SECTION 1
-%----------------------------------------------------------------------------------------
-
-\section{Conclusiones generales }
-
-La idea de esta sección es resaltar cuáles son los principales aportes del trabajo realizado y cómo se podría continuar. Debe ser especialmente breve y concisa. Es buena idea usar un listado para enumerar los logros obtenidos.
-
-En esta sección no se deben incluir ni tablas ni gráficos.
-
-Algunas preguntas que pueden servir para completar este capítulo:
+En el trabajo realizado se logró implementar de forma exitosa un prototipo de sistema de monitoreo y control para cultivos hidropónicos verticales. A través de las pruebas realizadas se pudo validar y demostrar su correcto funcionamiento. Se pueden nombrar los siguientes logros obtenidos:
 
 \begin{itemize}
-\item ¿Cuál es el grado de cumplimiento de los requerimientos?
-\item ¿Cuán fielmente se puedo seguir la planificación original (cronograma incluido)?
-\item ¿Se manifestó algunos de los riesgos identificados en la planificación? ¿Fue efectivo el plan de mitigación? ¿Se debió aplicar alguna otra acción no contemplada previamente?
-\item Si se debieron hacer modificaciones a lo planificado ¿Cuáles fueron las causas y los efectos?
-\item ¿Qué técnicas resultaron útiles para el desarrollo del proyecto y cuáles no tanto?
+    \item Se desarrolló e implementó un prototipo funcional que cumple con todos los requerimientos establecidos inicialmente, con capacidad para monitorear las variables ambientales de interés (temperatura, humedad, pH y conductividad eléctrica) y controlar los actuadores para el manejo del cultivo.
+    
+    \item Se diseñó y fabricó una PCB personalizada que integra todos los componentes electrónicos necesarios, con circuitos de acondicionamiento de señal para los sensores y etapas de potencia para los actuadores. El diseño se desarrolló con KiCad y se basó en buenas prácticas de diseño electrónico.
+    
+    \item Se implementó el firmware sobre FreeRTOS, lo que permitió optimizar los recursos del microcontrolador y desarrollar un código modular, escalable y mantenible. Se utilizaron colas y semáforos para la comunicación y sincronización entre tareas, lo que resultó en tiempos de respuesta promedio de 2,0 $\pm$ 0,3 segundos en la activación de actuadores.
+    
+    \item Se desarrolló un servidor web embebido con API REST que permite el monitoreo y control remoto del sistema. Se implementó autenticación segura, se configuró el soporte para CORS (\textit{Cross-Origin Resource Sharing}) para permitir solicitudes desde diferentes orígenes, y se validó el funcionamiento mediante pruebas con Postman.
+    
+    \item Se implementaron pruebas unitarias con Ceedling, bajo la metodología de desarrollo guiado por pruebas (TDD) que garantiza la calidad del código y facilita el mantenimiento futuro.
 \end{itemize}
 
+Durante el desarrollo del proyecto se aplicaron conocimientos adquiridos en diversas asignaturas de la formación, entre las que se destacan:
 
-%----------------------------------------------------------------------------------------
-%	SECTION 2
-%----------------------------------------------------------------------------------------
+\begin{itemize}
+    \item Arquitectura de software embebido: se implementó una arquitectura en capas que separa la aplicación, el sistema operativo y el hardware, con base en el patrón HAL (\textit{Hardware Abstraction Layer}). Se aplicó el patrón publicador/suscriptor para la comunicación entre componentes, lo que permitió un acoplamiento bajo y alta cohesión entre módulos.
+    
+    \item Programación de microcontroladores: se aplicaron conceptos de programación estructurada, modularización y patrones de diseño para desarrollar un código limpio y mantenible.
+    
+    \item Protocolos de comunicación: se implementaron protocolos como I2C para la comunicación con sensores, UART para la interfaz de depuración y HTTP/REST para la comunicación con el cliente.
+    
+    \item Sistemas operativos de tiempo real: se utilizó FreeRTOS para gestionar múltiples tareas concurrentes, con la implementación de mecanismos de sincronización como colas y semáforos. Se diseñó un plan de prioridades que garantiza el cumplimiento de los tiempos de respuesta esperados.
+    
+    \item Testing de software: se aplicó desarrollo guiado por pruebas (TDD) con Ceedling para garantizar la calidad del código y facilitar la detección temprana de errores. Se implementaron pruebas unitarias para los componentes críticos del sistema.
+    
+    \item Diseño de circuitos impresos: se aplicaron conocimientos de diseño electrónico para desarrollar un PCB funcional. Se siguió un enfoque modular que facilitó las pruebas y el mantenimiento del hardware.
+\end{itemize}
+
 \section{Próximos pasos}
 
-Acá se indica cómo se podría continuar el trabajo más adelante.
+Las siguientes mejoras podrían implementarse en futuras versiones del sistema:
 
-Este es un ejemplo de cita de un artículo \cite{ARTICLE:1}.  
-Aquí citamos un libro \cite{BOOK:1} y un capítulo de libro \cite{BOOK:2}.  
-También podemos citar una página web \cite{WEBSITE:1}.  
-O una referencia de un manual técnico \cite{dallas:ds18b20}.
+\begin{itemize}
+    \item Mejoras en el hardware:
+    \begin{itemize}
+        \item Rediseñar la PCB para integrar todos los componentes en una sola placa, lo que elimina la necesidad de módulos externos.
+        \item Añadir protección contra sobretensiones y picos de corriente para aumentar la confiabilidad del sistema.
+    \end{itemize}
+    
+    \item Actualizaciones de firmware:
+    \begin{itemize}
+        \item Implementar actualización de firmware por vía inalámbrica para facilitar el mantenimiento.
+        \item Añadir cifrado en las comunicaciones para mejorar la seguridad de los datos.
+        \item Optimizar el consumo de energía mediante la implementación de modos de bajo consumo.
+    \end{itemize}
+    
+    \item Nuevas funcionalidades:
+    \begin{itemize}
+        \item Incorporar sensores adicionales como CO2, oxígeno disuelto y radiación fotosintética.
+        \item Desarrollar una aplicación móvil nativa para facilitar el monitoreo y control desde dispositivos móviles.
+        \item Implementar un sistema de alertas por SMS o notificaciones push para avisos urgentes.
+        \item Desarrollar un sistema de control automático de la solución nutritiva, con monitoreo de pH y conductividad eléctrica.
+    \end{itemize}
+    
+    \item Mejoras en la escalabilidad:
+    \begin{itemize}
+        \item Desarrollar protocolos de comunicación de mayor alcance como LoRa o Sigfox para zonas rurales.
+        \item Crear una arquitectura distribuida que permita gestionar múltiples unidades de cultivo de forma centralizada.
+        \item Implementar compatibilidad con estándares de agricultura de precisión para facilitar la integración con otros sistemas.
+    \end{itemize}
+    
+    \item Optimización de recursos:
+    \begin{itemize}
+        \item Implementar algoritmos de aprendizaje automático para optimizar el uso de agua y nutrientes.
+        \item Desarrollar un sistema de recomendación de nutrientes basado en el estado actual del cultivo.
+        \item Crear modelos predictivos para anticipar necesidades de riego y fertilización.
+    \end{itemize}
+\end{itemize}
+
+Estas mejoras permitirían transformar el prototipo actual en un sistema comercialmente viable, con características avanzadas de monitoreo y control que podrían ser de gran utilidad para agricultores profesionales y entusiastas de la hidroponía por igual.
