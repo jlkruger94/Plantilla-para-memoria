@@ -17,7 +17,7 @@ En la figura \ref{fig:cobertura_codigo} se puede observar el resultado de las pr
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{./Figures/test/unit_test.png}
-\caption{Reporte de pruebas unitarias de Ceedling}
+\caption{Reporte de pruebas unitarias de Ceedling.}
 \label{fig:cobertura_codigo}
 \end{figure}
 
@@ -31,17 +31,17 @@ La validación del sistema de mensajería confirmó la correcta distribución de
     \begin{subfigure}[b]{1.0\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./Figures/test/suscripcion.png}
-        \caption{Proceso de suscripción a canales}
+        \caption{Proceso de suscripción a canales.}
         \label{fig:suscripcion}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{1.0\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./Figures/test/full_queue.png}
-        {\small \caption{Manejo de desbordamiento del buffer}
+        {\small \caption{Manejo de desbordamiento del buffer.}
         \label{fig:buffer_overflow}}
     \end{subfigure}
-    \caption{Resultados de las pruebas del sistema de mensajería}
+    \caption{Resultados de las pruebas del sistema de mensajería.}
     \label{fig:pruebas_mensajeria}
 \end{figure}
 
@@ -51,70 +51,52 @@ Finalmente, se estableció una relación 1:1 entre publicadores y suscriptores, 
 
 \subsubsection{API REST con Postman}
 Se desarrollaron pruebas de integración para los endpoints REST expuestos por el sistema, organizados por funcionalidad.
-A continuacion se listan los endpoints disponibles.
+
+A continuación, se listan los endpoints disponibles.
 
 \begin{itemize}
-    \item \textbf{Autenticación}
+    \item Autenticación
     \begin{itemize}
-        \item \texttt{POST /v1/login}: autenticación de usuario
+        \item \texttt{POST /v1/login}: autenticación de usuario.
     \end{itemize}
     
-    \item \textbf{Estado del Sistema}
+    \item Estado del sistema
     \begin{itemize}
-        \item \texttt{GET /v1/status}: estado general del sistema
+        \item \texttt{GET /v1/status}: estado general del sistema.
     \end{itemize}
     
-    \item \textbf{Sensores}
+    \item Sensores
     \begin{itemize}
-        \item \texttt{GET /v1/sensors}: lectura de datos de sensores (temperatura, humedad, pH, CE, etc.)
+        \item \texttt{GET /v1/sensors}: lectura de datos de sensores (temperatura, humedad, pH, CE, etc.).
     \end{itemize}
     
-    \item \textbf{Actuadores}
+    \item Actuadores
     \begin{itemize}
-        \item \texttt{GET /v1/actuators}: estado actual de los actuadores
-        \item \texttt{POST /v1/actuators}: control de actuadores (bomba, ventilador, luces, calefactor)
+        \item \texttt{GET /v1/actuators}: estado actual de los actuadores.
+        \item \texttt{POST /v1/actuators}: control de actuadores (bomba, ventilador, luces, calefactor).
     \end{itemize}
     
-    \item \textbf{Configuración}
+    \item Configuración
     \begin{itemize}
-        \item \texttt{GET /v1/config}: obtener configuración actual
-        \item \texttt{POST /v1/config}: actualizar configuración
+        \item \texttt{GET /v1/config}: obtener configuración actual.
+        \item \texttt{POST /v1/config}: actualizar configuración.
     \end{itemize}
     
-    \item \textbf{Registros del Sistema}
+    \item Registros del sistema
     \begin{itemize}
-        \item \texttt{GET /v1/logs}: obtener registros del sistema
-        \item \texttt{DELETE /v1/log/clean}: limpiar registros
+        \item \texttt{GET /v1/logs}: obtener registros del sistema.
+        \item \texttt{DELETE /v1/log/clean}: limpiar registros.
     \end{itemize}
 \end{itemize}
 
-Todas las peticiones requieren autenticación mediante token, excepto el endpoint de login. El token debe incluirse en el encabezado \texttt{Authorization} de las peticiones posteriores a la autenticación. La figura \ref{fig:pruebas_api} muestra la petición de actualización de configuración realizada con Postman, mientras que la figura \ref{fig:consola_config} muestra la salida correspondiente en la consola de la ESP32 durante este proceso.
+Todas las peticiones requieren autenticación mediante token, excepto el endpoint de login. El token debe incluirse en el encabezado \texttt{Authorization} de las peticiones posteriores a la autenticación.
 
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}[b]{1.0\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{./Figures/test/config_postman.png}
-        \caption{Pruebas de API con Postman - actualización de la configuración}
-        \label{fig:pruebas_api}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{1.0\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{./Figures/test/update_config.png}
-        \caption{Salida por consola durante la actualización de la configuración}
-        \label{fig:consola_config}
-    \end{subfigure}
-    \caption{Proceso de actualización de configuración.}
-    \label{fig:configuracion_completa}
-\end{figure}
-
-En la figura \ref{fig:config_sin_token} se muestra la respuesta del servidor al intentar acceder sin autenticación, el sistema rechaza correctamente las peticiones que no incluyen un token de autenticación válido y devuelve un código de estado HTTP 401 (no autorizado) junto con un mensaje de error.
+En la figura \ref{fig:config_sin_token} se muestra la respuesta del servidor al intentar acceder al endpoint de configuración sin autenticación, el sistema rechaza correctamente las peticiones que no incluyen un token de autenticación válido y devuelve un código de estado HTTP 401 (no autorizado) junto con un mensaje de error.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{./Figures/test/config_sin_token.png}
-\caption{Respuesta del servidor al intentar acceder sin autenticación}
+\caption{Respuesta del servidor al intentar acceder sin autenticación.}
 \label{fig:config_sin_token}
 \end{figure}
 
@@ -125,15 +107,50 @@ Se verificó el sistema de rotación de logs, que incluyó la rotación automát
 Se implementó un sistema de envío de datos a un servidor backend mediante peticiones HTTP POST. El sistema utiliza un único endpoint para el envío de datos, con un esquema JSON que incluye todos los parámetros del sistema.
 
 \begin{itemize}
-    \item \textbf{Endpoint:} \texttt{http://IP-raspberry-pi/api/v1/telemetry}
-    \item \textbf{Método:} POST
-    \item \textbf{Autenticación:} sin autenticación (en fase de pruebas)
-    \item \textbf{Formato de los datos:} JSON
+    \item Endpoint: \texttt{http://IP-raspberry-pi/api/v1/telemetry}.
+    \item Método: POST.
+    \item Autenticación: sin autenticación (en fase de pruebas).
+    \item Formato de los datos: JSON.
 \end{itemize}
 
-A continuación se muestra el esquema JSON que se envía al servidor.
+En el código \ref{cod:esquema_json} se muestra el esquema JSON que se envía al servidor.
 
-\begin{verbatim}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% parámetros para configurar el formato del código en los entornos lstlisting
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  %escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  %extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  %frame=single,	                % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=[ANSI]C,                % the language of the code
+  %otherkeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname,                  % show the filename of files included with \lstinputlisting; also try caption instead of title
+  morecomment=[s]{/*}{*/}
+}
+\begin{lstlisting}[label=cod:esquema_json,caption=Esquema JSON que se envía al servidor.]
 {
   "device_id": "hydrogrow-001",
   "timestamp": "2025-03-30T14:12:00Z",
@@ -156,7 +173,7 @@ A continuación se muestra el esquema JSON que se envía al servidor.
   },
   "alerts": []
 }
-\end{verbatim}
+\end{lstlisting}
 
 Con el fin de testear el dispositivo, se implementó un servidor de telemetría que recibe datos mediante una API REST. Los datos se guardan en una base de datos PostgreSQL. En esta versión inicial de pruebas no se implementó autenticación ni encriptación, pero están planificadas para versiones futuras.
 
@@ -180,77 +197,67 @@ Se implementaron pruebas para verificar la sincronización del estado entre tare
 El sistema se sometió a pruebas de condiciones de carrera que incluyeron la validación del acceso concurrente a recursos compartidos (variables globales, archivos y funciones de acceso a memoria), la verificación del manejo de prioridades de tareas, la confirmación del funcionamiento adecuado de las secciones críticas y mecanismos de sincronización, la evaluación de posibles situaciones de interbloqueo, así como la comprobación del manejo correcto de colas de mensajes en estados de lleno y vacío.
 
 \subsubsection{Manejo de configuración}
-Se probó la generación, lectura y actualización del archivo config.json, lo que incluyó la creación con valores por defecto, la carga correcta de la configuración durante el inicio, la capacidad de actualizar parámetros de forma dinámica, la validación de los valores configurados, el manejo adecuado de archivos corruptos o faltantes y la persistencia ante reinicios inesperados.
+Se probó la generación, lectura y actualización del archivo \texttt{config.json}, lo que incluyó la creación con valores por defecto, la carga correcta de la configuración durante el inicio, la capacidad de actualizar parámetros de forma dinámica, la validación de los valores configurados, el manejo adecuado de archivos corruptos o faltantes y la persistencia ante reinicios inesperados.
+La figura \ref{fig:pruebas_api} muestra la petición de actualización de configuración realizada con Postman, mientras que la figura \ref{fig:consola_config} muestra la salida correspondiente en la consola de la ESP32 durante este proceso.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{1.0\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/test/config_postman.png}
+        \caption{Pruebas de API con Postman - actualización de la configuración.}
+        \label{fig:pruebas_api}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{1.0\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/test/update_config.png}
+        \caption{Salida por consola durante la actualización de la configuración.}
+        \label{fig:consola_config}
+    \end{subfigure}
+    \caption{Proceso de actualización de configuración.}
+    \label{fig:configuracion_completa}
+\end{figure}
+
 
 \subsubsection{Conectividad de red}
-Las pruebas de conectividad verificaron la configuración inicial mediante WPS con el botón físico del dispositivo, que incluyó la asignación de dirección IP estática (192.168.0.100/24, con red estándar de gateway 192.168.0.x) en la red local y el almacenamiento persistente de credenciales en la memoria flash. En el fragmento de código \ref{fig:inicializacion}, se muestra el resultado de la inicialización del sistema y se aprecia la configuración de la IP estática junto con la configuración WPS.
+Las pruebas de conectividad verificaron la configuración inicial mediante WPS con el botón físico del dispositivo, que incluyó la asignación de dirección IP estática (\texttt{192.168.0.100/24}, con red estándar de gateway \texttt{192.168.0.x}) en la red local y el almacenamiento persistente de credenciales en la memoria flash. En el fragmento de código \ref{fig:inicializacion}, se muestra el resultado de la inicialización del sistema y se aprecia la configuración de la IP estática junto con la configuración WPS.
 
-
+\begin{figure}[H]
+\centering
+\begin{minipage}{\textwidth}
 \begin{lstlisting}[language={},
-    frame=single,
-    basicstyle=\footnotesize\ttfamily,
+    %frame=single,
+    %basicstyle=\footnotesize\ttfamily,
     breaklines=true,
     breakatwhitespace=true,
     prebreak=\mbox{\tiny$\searrow$},
     postbreak=\mbox{\tiny$\rightarrow$},
     columns=fullflexible,
     showstringspaces=false,
-    tabsize=2,
-    xleftmargin=10pt,
-    xrightmargin=10pt,
-    caption={Resultado de la inicialización del sistema},
+    %tabsize=2,
+    %xleftmargin=10pt,
+    %xrightmargin=10pt,
+    caption={Resultado de la inicialización del sistema tomado de la consola de depuración.},
     label=fig:inicializacion,
-    captionpos=b,
+    %captionpos=b,
     inputencoding=utf8,
     extendedchars=true,
     literate={\r\n}{\newline}1 {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1 {¿}{{?`}}1 {¡}{{!`}}1
 ]
 I (856) wifi: Iniciando WPS...
 I (866) wifi: WIFI_EVENT_STA_START (WPS mode)
-I (956) adminitrator: Esperando conexión WiFi...
-W (27696) wifi:Password length matches WPA2 standards, authmode threshold changes from OPEN to WPA2
-I (27736) wifi:state: run -> init (c0)
-I (27746) wifi: WIFI_EVENT_STA_DISCONNECTED (WPS mode)
 I (28736) wifi: WPS exitoso
 I (28746) wifi: WiFi credentials saved to filesystem
-I (28746) wifi: Conectando a SSID:
-I (28756) wifi:state: run -> init (0)
-I (28766) wifi:new:<1,0>, old:<1,0>, ap:<255,255>, sta:<1,0>, prof:1
-I (28766) wifi: WIFI_EVENT_STA_DISCONNECTED (WPS mode)
-I (28896) wifi:security: WPA2-PSK, phy: bgn, rssi: -56
-I (28896) wifi:pm start, type: 1
-I (28896) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us
-I (28916) wifi:AP's beacon interval = 102400 us, DTIM period = 1
-I (32416) esp_netif_handlers: sta ip: 192.168.0.5, mask: 255.255.255.0, gw: 192.168.0.1
-I (32416) wifi: IP obtenida: 192.168.0.5
-I (32416) wifi: Gateway: 192.168.0.1
-I (32426) wifi: NetMask: 255.255.255.0
-I (32426) wifi: DNS primaria: 190.105.0.6
-I (32426) wifi: DNS secundaria: 190.105.0.133
 I (32436) wifi: Gateway aprendido: 192.168.0.1. Reconfigurando con IP estática...
 I (32436) adminitrator: Conectado exitosamente
 I (34446) wifi: Reconectando con IP estática usando gateway: 192.168.0.1
-I (34446) wifi:state: run -> init (0)
-I (34466) wifi: WIFI_EVENT_STA_DISCONNECTED (WPS mode)
 I (35456) wifi: Configurando IP estática: IP=192.168.0.100, GW=192.168.0.1, NETMASK=255.255.255.0
-I (35456) wifi: DNS primaria configurada: 190.105.0.6
-I (35456) wifi: DNS secundaria configurada: 190.105.0.133
-I (35466) wifi: IP estática configurada correctamente
-I (35466) wifi: Reconexión iniciada con IP estática
-I (35636) wifi:security: WPA2-PSK, phy: bgn, rssi: -61
-I (35646) wifi:pm start, type: 1
-I (35646) esp_netif_handlers: sta ip: 192.168.0.100, mask: 255.255.255.0, gw: 192.168.0.1
-I (35656) wifi: IP obtenida: 192.168.0.100
-I (35656) wifi: Gateway: 192.168.0.1
-I (35666) wifi: NetMask: 255.255.255.0
-I (35666) wifi: DNS primaria: 190.105.0.6
-I (35676) wifi: DNS secundaria: 190.105.0.133
 I (42446) web_server: HTTP Server started
 I (42446) hydro_rest: Todos los endpoints REST registrados correctamente
-I (42446) RTC: Inicializando SNTP...
-I (42456) RTC: Cliente SNTP iniciado
-I (42466) RTC: Actualizando hora vía SNTP...
 \end{lstlisting}
+\end{minipage}
+\end{figure}
 
 %\begin{figure}[htbp]
 %    \centering
@@ -275,7 +282,7 @@ Se verificó el correcto funcionamiento del sistema de protección contra sobrec
 %======================
 \section{Pruebas de integración}
 
-Una vez validados los módulos individuales, se realizaron pruebas de integración para verificar el funcionamiento conjunto del hardware, firmware e interfaz web, con el objetivo de analizar la comunicación y sincronización entre las tareas del firmware —monitores, controladores y servidor embebido—. Estas pruebas permitieron validar la interacción entre los componentes del sistema, la estabilidad de la comunicación en condiciones controladas, la coherencia de los datos transmitidos y la correcta ejecución de las acciones automáticas. En la figura \ref{fig:dashboard} se muestra la vista de sensores de la interfaz web, donde se pueden visualizar los valores medidos en tiempo real.
+Una vez validados los módulos individuales, se realizaron pruebas de integración para verificar el funcionamiento conjunto del hardware, firmware e interfaz web, con el objetivo de analizar la comunicación y sincronización entre las tareas del firmware (monitores, controladores y servidor embebido). Estas pruebas permitieron validar la interacción entre los componentes del sistema, la estabilidad de la comunicación en condiciones controladas, la coherencia de los datos transmitidos y la correcta ejecución de las acciones automáticas. En la figura \ref{fig:dashboard} se muestra la vista de sensores de la interfaz web, donde se pueden visualizar los valores medidos en tiempo real.
 
 \begin{figure}[H]
     \centering
@@ -291,18 +298,18 @@ Las pruebas se realizaron siguiendo un procedimiento estructurado que comenzó c
 
 Esta etapa tuvo por objetivo asegurar que el sistema cumple con los requerimientos definidos durante la planificación del trabajo.
 
-A continuación se detallan los requerimientos funcionales validados y las pruebas realizadas para cada uno:
+A continuación, se detallan los requerimientos funcionales validados y las pruebas realizadas para cada uno:
 
 \begin{itemize}
     \item Control automático de riego, iluminación y oxigenación: se verificó que el sistema pueda controlar el estado de los actuadores según las condiciones ambientales monitoreadas y los parámetros de control definidos. Las pruebas incluyeron cambios en las condiciones ambientales, donde se midió el tiempo de respuesta del sistema desde la detección de la variación hasta la activación del actuador. Utilizando un cronómetro, se registró un tiempo de respuesta promedio de 2,0 $\pm 0.3$ segundos en 25 mediciones consecutivas, lo que cumple con el requisito de respuesta en menos de 5 segundos. Los resultados demostraron una activación consistente y confiable de los sistemas de riego, iluminación y oxigenación en respuesta a las condiciones ambientales monitoreadas y los parámetros de control.
     
     \item Monitoreo de variables ambientales: se validó la precisión y confiabilidad del sistema de adquisición de datos mediante la comparación con instrumentos de referencia calibrados. Se utilizó un termómetro digital (precisión $\pm 0.1$ °C), dos soluciones buffer de pH (precisión $\pm 0.02$) y un conductímetro de mercado (precisión $\pm 2\,\mu$S/cm) como estándares de referencia. Las mediciones se realizaron en condiciones controladas de laboratorio, con un banco de pruebas que simulaba las condiciones del cultivo. Se evaluaron diferentes configuraciones de parámetros ambientales, que incluyeron temperatura, humedad y composición de la solución nutritiva. Las mediciones mostraron una concordancia aceptable con los instrumentos de referencia, lo que confirmó la precisión del sistema de medición en condiciones controladas. Todos los valores medidos se mantuvieron dentro de los rangos especificados: temperatura ($\pm 0.8$ °C), humedad del sustrato (sin patrón de referencia, $\pm 2.5 \%$ de precisión según especificaciones del fabricante), nivel de solución nutritiva (mínimo 3/4 del contenedor), conductividad eléctrica ($\pm 0.1$ mS/cm) y pH ($\pm 0.1$).
     
-    \item Activación manual de secuencias de riego: Se realizaron 10 pruebas consecutivas en las que se midió el tiempo de respuesta desde la interacción del usuario en la interfaz hasta la activación del sistema de riego. Los resultados mostraron un tiempo promedio de respuesta de 1.2 segundos, lo que cumple con el requerimiento de menos de 2 segundos.
+    \item Activación manual de secuencias de riego: Se realizaron 10 pruebas consecutivas en las que se midió el tiempo de respuesta desde la interacción del usuario en la interfaz hasta la activación del sistema de riego. Los resultados mostraron un tiempo promedio de respuesta de 1,2 segundos, lo que cumple con el requerimiento de menos de 2 segundos.
     
     \item Servidor embebido: se realizaron pruebas de disponibilidad en diferentes momentos del día. El servidor se mantuvo en funcionamiento continuo durante 72 horas, período en el que se monitoreó su rendimiento con peticiones HTTP cada 2 segundos. El sistema demostró un 100\% de disponibilidad.
     
-    \item Interfaz gráfica accesible desde móviles: Las pruebas en diferentes dispositivos móviles (Android) y navegadores (Chrome, Firefox) mostraron tiempos de carga promedio de 200 ms en conexiones Wi-Fi, cumpliendo con el requerimiento de menos de 5 segundos.
+    \item Interfaz gráfica accesible desde móviles: Las pruebas en diferentes dispositivos móviles (Android) y navegadores (Chrome, Firefox) mostraron tiempos de carga promedio de 200 ms en conexiones Wi-Fi, lo que cumple con el requerimiento de menos de 5 segundos.
     
     \item Programación de secuencias de riego: se configuraron múltiples secuencias de riego con diferentes parámetros (por tiempo, humedad del sustrato, horarios específicos). La precisión de ejecución se verificó con un reloj atómico como referencia, lo que permitió alcanzar una precisión de $\pm 1$ segundo, con lo que se superó el requerimiento de $\pm 1$ minuto.
 \end{itemize}
@@ -314,7 +321,7 @@ El banco de pruebas, mostrado en la figura \ref{fig:montaje_pruebas}, se configu
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{./Figures/test/Setup.png}
-\caption{Configuración del banco de pruebas con los componentes principales del sistema}
+\caption{Configuración del banco de pruebas con los componentes principales del sistema.}
 \label{fig:montaje_pruebas}
 \end{figure}
 
