@@ -310,9 +310,9 @@ Estas medidas aumentan la durabilidad del sistema y reducen el riesgo de fallos 
 % Describir la integración de todos los componentes en el sistema completo.
 Una vez completado el montaje del PCB, se procedió a la integración de los sensores y actuadores al sistema principal. Los sensores DS18B20, capacitivo v2.0, BH1750, PH-4502C, conductividad eléctrica y nivel de solución se conectaron a los puertos correspondientes de la PCB mediante cables de señal y cables de alimentación. Los actuadores (bomba sumergible de 220 V, módulos LED full-spectrum y ventiladores axiales) se interconectaron al sistema de relés del PCB para su control automatizado.
 
-La fuente de alimentación conmutada de 5 V se conectó al circuito de entrada, lo que proporciona la energía necesaria para todo el sistema. Para garantizar la protección contra condiciones ambientales adversas, la placa se montó dentro de un gabinete estanco con certificación IP67. Se verificaron todas las conexiones eléctricas y mecánicas antes de proceder con las pruebas funcionales. Luego, se realizó una inspección visual completa del ensamblado para asegurar la correcta integración de todos los componentes y la ausencia de conexiones sueltas o daños en el cableado.
+La fuente de alimentación conmutada de 5 V se conectó al circuito de entrada, lo que proporciona la energía necesaria para todo el sistema. Para garantizar la protección contra condiciones ambientales adversas, la placa se montó dentro de un gabinete estanco con certificación IP65. Se verificaron todas las conexiones eléctricas y mecánicas antes de proceder con las pruebas funcionales. Luego, se realizó una inspección visual completa del ensamblado para asegurar la correcta integración de todos los componentes y la ausencia de conexiones sueltas o daños en el cableado.
 
-Posteriormente, el sistema se instaló en el cultivo hidropónico. Los sensores se posicionaron estratégicamente en el sistema: el DS18B20 se sumergió en la solución nutritiva para monitoreo de temperatura, el sensor capacitivo se instaló en el sustrato para medir humedad, el BH1750 se ubicó sobre el área de cultivo para controlar iluminación, el PH-4502C y sensor de conductividad se colocaron en el depósito de solución y el sensor de nivel se fijó en el tanque de reserva.
+Posteriormente, el sistema se instaló en el cultivo hidropónico. Los sensores se posicionaron estratégicamente en el sistema: el DS18B20 se sumergió en la solución nutritiva para monitoreo de temperatura, el sensor capacitivo se instaló en el sustrato para medir humedad, el BH1750 se ubicó sobre el gabinete para controlar iluminación, el PH-4502C y sensor de conductividad se colocaron en el depósito de solución y el sensor de nivel se fijó en el tanque de reserva.
 
 Los actuadores se integraron al sistema hidropónico de la siguiente manera: la bomba sumergible se instaló en el depósito para recirculación, los módulos LED se montaron sobre el área de cultivo para iluminación, y los ventiladores se colocaron para circulación de aire. Finalmente, se procedió a la configuración de parámetros del sistema antes de iniciar las operaciones automatizadas.
 
@@ -359,7 +359,7 @@ La selección de los sensores se realizó considerando precisión, estabilidad, 
 
     \item Nivel de solución: sensor de flotador con interruptor convencional y resistente al ambiente húmedo. Proporciona una detección simple y confiable del nivel mínimo requerido (3/4 de la altura del contenedor) mediante una señal digital clara, ideal para alertas automáticas sin necesidad de mediciones continuas.
 
-    \item Luminosidad: sensor digital BH1750, con rango de 1 a 65\,535\,lx, conectado por bus I2C. El amplio rango dinámico permite un control preciso de la iluminación artificial requerida para el ciclo día-noche del cultivo, con interfaz I2C que optimiza la integración con el microcontrolador.
+    \item Luminosidad: sensor digital BH1750 con rango de 1 a 65\,535\,lx. El amplio rango dinámico permite una medición precisa de la iluminación artificial requerida para el ciclo día-noche del cultivo, con interfaz I2C que optimiza la integración con el microcontrolador.
 \end{itemize}
 
 \subsection{Calibración de sensores}
@@ -367,10 +367,10 @@ La selección de los sensores se realizó considerando precisión, estabilidad, 
 Cada sensor fue sometido a un proceso de calibración inicial para asegurar lecturas precisas:
 
 \begin{itemize}
-    \item Para calibrar el sensor de pH, se utilizaron soluciones buffer de pH 4 y 6,86 $\pm 0.02$ a temperatura ambiente. Se limpió el sensor con agua destilada y se sumergió en la solución de pH 4 durante 1 minuto, y se ajustó el potenciomentro del módulo de adaptación. Posteriormente, se repitió el proceso con la solución de pH 6,86 durante 1 minuto. Finalmente, se midió agua de red para verificar que el pH resportado fuera cercano a 7,5.
+    \item Para calibrar el sensor de pH, se utilizaron soluciones buffer de pH 4 y 6,86 $\pm 0,02$, agua destilada y agua de red a temperatura ambiente. Primero, se limpió el sensor con agua destilada y se sumergió en un recipiente con agua de red. Luego se ajustó el potenciómetro a un valor de salida de 2,5 V (mitad de escala). A continuación, el sensor se sumergió en la solución de pH 4 durante un minuto y se ajustó el valor crudo al punto de correspondencia de pH. Este proceso se repitió con la solución de pH 6,86. Por último, se midió el agua de red para verificar que el valor reportado fuera cercano a 7,5.
     \item Para calibrar el sensor de conductividad, se utilizó agua destilada para marcar el valor de 0 mS/cm y una sonda patrón de conductividad para marcar el valor de 1 mS/cm mediante una solución de NaCl de 1 mS/cm a temperatura ambiente.
     \item Para calibrar el sensor de temperatura, se utilizó un termómetro patrón como referencia y se realizaron mediciones en dos puntos fijos: 0 °C, obtenido mediante una mezcla en equilibrio de hielo triturado y agua, y a aproximadamente 50 °C. Ambos instrumentos se colocaron a la misma profundidad, sin contacto con las paredes del recipiente y tras alcanzar el equilibrio térmico, para lograr así una calibración práctica y suficientemente precisa para las condiciones disponibles. Para mantener el sistema a una temperatura constante, se utilizaron 1,5 litros de agua en un termo de vidrio.
-    \item Para calibrar el sensor de humedad, se realizó una medición en un ambiente controlado con un humedad del sustrato de 0 \%. Se ajustó el sensor hasta que coincidió con el valor medido y luego se sumergió completamente en agua para verificar que resportara el valor máximo de 100 \%.
+    \item Para calibrar el sensor de humedad, primero se realizó una medición con el sensor en sustrato seco y se estableció el valor en 0 \%. Luego se sumergió completamente en agua y se ajustó el valor a 100 \%.
     \item El sensor de luminosidad se utilizó con su calibración de fábrica, que proporciona mediciones precisas dentro de los rangos especificados por el fabricante.
 \end{itemize}
 
@@ -390,7 +390,7 @@ Esta sección describe el diseño, estructura y funcionamiento de la interfaz gr
 % Describir la disposición visual, estilo, principios de diseño y usabilidad.
 El diseño se implementó siguiendo la metodología de diseño \textit{mobile-first}, con un esquema de colores contrastantes que mejora la legibilidad de los valores mostrados. La interfaz se organiza en un diseño modular basado en tarjetas, donde cada sección agrupa información relacionada. Esta estructura no solo optimiza la navegación, sino que también facilita la identificación de los estados del sistema.
 
-El núcleo \texttt{App} contiene dos componentes principales: \texttt{Navbar} y \texttt{Router}. Este último gestiona todas las vistas: \texttt{Login} para autenticación, \texttt{Dashboard} con gráficos y estados de sensores, \texttt{Actuators} para control de actuadores, \texttt{Config} para ajustes avanzados, y \texttt{Logs} con el historial de alertas. Además, se incluye el componente \texttt{AuthProvider}, encargado de gestionar y proporcionar a los distintos componentes las credenciales de acceso al servidor embebido.
+El núcleo \texttt{App} contiene dos componentes principales: \texttt{Navbar} y \texttt{Router}. Este último gestiona todas las vistas: \texttt{Login} para autenticación, \texttt{Dashboard} con gráficos y estados de sensores, \texttt{Actuators} para control de actuadores, \texttt{Config} para ajustes avanzados, y \texttt{Logs} con el historial de alertas. Además, se incluye el módulo \texttt{AuthProvider}, encargado de gestionar y proporcionar a los distintos componentes las credenciales de acceso al servidor embebido.
 
 La figura \ref{fig:flow} muestra la estructura jerárquica de la aplicación.
 
@@ -422,7 +422,7 @@ La seguridad de las comunicaciones se garantiza mediante un sistema de autentica
     \label{fig:login_sec}
 \end{figure}
 
-\subsubsection*{Monitoreo de sensores}
+\subsection{Monitoreo de sensores}
 % Explicar qué muestra y cómo se actualiza.
 El panel principal muestra los valores medidos por los sensores. El componente \texttt{Sensors} realiza peticiones periódicas al backend embebido para obtener los datos más recientes cuando el usuario accede a esta sección. Cada sensor se presenta en una tarjeta que muestra su valor actual, unidad de medida y estado, con actualizaciones automáticas cada 1,5 segundos que garantizan la vigencia de la información. La interfaz también incluye indicadores visuales que muestran los estados de carga y los posibles errores en la comunicación con la API.
 
@@ -430,36 +430,36 @@ La figura \ref{fig:sensores} muestra el diagrama de secuencia que describe la in
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{./Figures/ui/sensores.png}
+    \includegraphics[width=0.8\textwidth]{./Figures/ui/sensores.png}
     \caption{Diagrama de secuencia de la vista de monitoreo de sensores.}
     \label{fig:sensores}
 \end{figure}
 
-\subsubsection*{Control de actuadores}
+\subsection{Control de actuadores}
 % Describir cómo el usuario controla actuadores o configuraciones.
 En esta vista, el usuario tiene la capacidad de activar o desactivar manualmente los actuadores, como la bomba de riego, la iluminación y la ventilación, mientras visualiza el estado actual de cada uno de ellos (ver figura \ref{fig:actuadores_sec}). Las acciones se transmiten al backend embebido mediante solicitudes \texttt{POST} y \texttt{GET} a los endpoints correspondientes.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{./Figures/ui/actuadores.png}
+    \includegraphics[width=1.2\textwidth]{./Figures/ui/actuadores.png}
     \caption{Diagrama de secuencia de la vista de control de actuadores.}
     \label{fig:actuadores_sec}
 \end{figure}
 
-\subsubsection*{Configuración del sistema}
+\subsection{Configuración del sistema}
 % Explicar cómo se gestionan los parámetros del sistema.
 El panel de configuración permite modificar umbrales de alarma, períodos de riego o ventilación y horario de iluminación (ver figura \ref{fig:configuracion_sec}). Una vez confirmados los cambios, el sistema actualiza el archivo \texttt{config.json} en memoria flash y propaga los nuevos valores a los controladores correspondientes.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth]{./Figures/ui/configuracion.png}
+    \includegraphics[width=0.9\textwidth]{./Figures/ui/configuracion.png}
     \caption{Diagrama de secuencia de la vista de configuración.}
     \label{fig:configuracion_sec}
 \end{figure}
 
 \subsection{Logs del sistema}
 % Explicar endpoints y métodos principales.
-Por último, el panel de logs muestra los eventos relevantes del sistema, como errores y advertencias. Incluye un botón de limpieza que permite vaciar el registro de eventos cuando sea necesario.
+Por último, el panel de logs muestra los eventos relevantes del sistema, como errores y advertencias. Además, incluye un botón de limpieza que permite vaciar el registro cuando el usuario lo requiera.
 
 \subsection{Compatibilidad y optimización}
 % Mencionar compatibilidad con dispositivos y rendimiento.
