@@ -20,8 +20,8 @@ A continuación, se describen brevemente los bloques y su función.
 
 \begin{itemize}
 	\item Sensores: este bloque se encarga de la transducción de magnitudes físicas en señales eléctricas, lo que permite la digitalización de variables ambientales de interés para el control del cultivo.
-	\item Adaptación de señal: los módulos de adaptación acondicionan las señales provenientes de los sensores. Para garantizar la correcta interpretación por parte de la unidad de microcontrolador o MCU (del inglés \textit{MicroController Unit}), ajustan los niveles de tensión y la relación señal-ruido a valores apropiados.
-	\item MCU: el núcleo del sistema, basado en el chip ESP32, orquesta la comunicación y el control de todos los módulos. Provee la capacidad de procesamiento y la conectividad inalámbrica necesarias para la automatización del cultivo y la interacción con la aplicación móvil.
+	\item Adaptación de señal: los módulos de adaptación acondicionan las señales provenientes de los sensores. Para garantizar la correcta interpretación por parte de la unidad de microcontrolador o MCU (del inglés, \textit{MicroController Unit}), ajustan los niveles de tensión y la relación señal-ruido a valores apropiados.
+	\item MCU: el núcleo del sistema, basado en el chip ESP32, comanda la comunicación y el control de todos los módulos. Provee la capacidad de procesamiento y la conectividad inalámbrica necesarias para la automatización del cultivo y la interacción con la aplicación móvil.
 	\item Interfaces de salida: proporcionan aislamiento galvánico y acondicionamiento de potencia para la activación de los actuadores, lo que asegura la protección del MCU y la correcta operación de los componentes de mayor potencia.
 	\item Actuadores: los actuadores (ventiladores, bomba de irrigación, luces, resistencia calefactora) ejecutan las acciones de control y modifican las condiciones ambientales del cultivo según las necesidades.
 	\item Aplicación móvil de usuario: desarrollada para facilitar la interacción con el sistema, la aplicación móvil permite el monitoreo en tiempo real de las condiciones del cultivo y el control remoto de los actuadores.
@@ -64,13 +64,6 @@ La capa de aplicación, figura \ref{fig:arq_bloques}, está constituida por los 
 
 A continuación, se describe brevemente la funcionalidad de cada uno de estos componentes.
 
-\begin{figure}[H]
-\centering
-\includegraphics[scale=.4]{./Figures/arq_bloques.png}
-    \caption{Diagrama de módulos funcionales y sus interacciones.}
-    \label{fig:arq_bloques}
-\end{figure}
-
 \begin{itemize}
 	\item Monitor de temperatura: mide la temperatura de la solución nutritiva para garantizar que las plantas crezcan en un entorno térmicamente adecuado.
 	\item Monitor de conductividad eléctrica (CE): evalúa la concentración de nutrientes presentes en la solución hidropónica.
@@ -85,9 +78,12 @@ A continuación, se describe brevemente la funcionalidad de cada uno de estos co
 	\item Administrador: es el componente encargado de la centralización y validación global de los datos suministrados por los demás módulos de software.
 \end{itemize}
 
-
-
-
+\begin{figure}[H]
+\centering
+\includegraphics[scale=.4]{./Figures/arq_bloques.png}
+    \caption{Diagrama de módulos funcionales y sus interacciones.}
+    \label{fig:arq_bloques}
+\end{figure}
 
 
 \section{Desarrollo del software}
@@ -223,8 +219,9 @@ Esta sección describe el proceso completo de diseño, implementación y validac
 El sistema está conformado por una placa principal que integra módulos independientes que trabajan de manera coordinada. Entre estos se incluyen el módulo de control principal basado en ESP32, los sensores ambientales, los actuadores y la alimentación.
 
 \subsection{Diseño electrónico}
+\label{sec:hw:design}
 % Explicar cómo se diseñaron las placas, esquemas, y conexiones eléctricas.
-El diseño electrónico se realizó en base a una arquitectura modular centralizada en una placa principal. Esta placa interconecta los adaptadores de señal de los módulos sensores junto con la distribución de la alimentación, la conexión y protección de las GPIOs del microcontrolador junto con la protección general del circuito. La placa tiene completamente integrada la interfaz de salida con circuitos de aislamiento galvánico y relés para cada actuador, que manejan 220 V de corriente alterna. Para la alimentación de los módulos se implementó un regulador lineal LM1117, y para adaptar el módulo de pH de 5 V a 3,3 V (nivel de referencia del ADC) se utilizó un divisor resistivo. Finalmente, se incorporó un \textit{shield} de salida con las GPIOs restantes para permitir la conexión de módulos adicionales en el futuro. Se empleó \textit{KiCad} para la creación del circuito impreso (PCB), como se detalla en las figuras \ref{fig:esquematico:base} y \ref{fig:esquematico:reles}.
+El diseño electrónico se realizó en base a una arquitectura modular centralizada en una placa principal. Esta placa interconecta los adaptadores de señal de los módulos sensores junto con la distribución de la alimentación, la conexión y protección de las GPIOs del microcontrolador junto con la protección general del circuito. La placa tiene completamente integrada la interfaz de salida con circuitos de aislamiento galvánico y relés para cada actuador, que manejan 220 V de corriente alterna. Para la alimentación de los módulos se implementó un regulador lineal LM1117, y para adaptar el módulo de pH de 5 V a 3,3 V (nivel de referencia del ADC) se utilizó un divisor resistivo. Finalmente, se incorporó un \textit{shield} de salida con las GPIOs restantes para permitir la conexión de módulos adicionales en el futuro. Se empleó KiCad para la creación del circuito impreso (PCB), como se detalla en las figuras \ref{fig:esquematico:base} y \ref{fig:esquematico:reles}.
 
 \begin{figure}[h]
 \centering
@@ -258,7 +255,7 @@ Los actuadores fueron integrados para el control automatizado de las condiciones
     \item \texttt{Ventiladores}: kit de ventiladores axiales de 12 V de caudal fijo con alimentación de 220 V.
 \end{itemize}
 
-El control de los actuadores se implementa mediante el sistema de relés mecanicos descrito en la sección de diseño electrónico, con interfaz a través de las salidas GPIO.
+El control de los actuadores se implementa mediante el sistema de relés mecanicos descrito en la sección \ref{sec:hw:design}, con interfaz a través de las salidas GPIO.
 
 \subsection{Alimentación}
 % Explicar fuentes, reguladores y protecciones eléctricas.
@@ -269,6 +266,8 @@ El circuito se alimenta con una fuente conmutada de 5 V como entrada principal. 
 El diseño del PCB se basa en principios prácticos de diseño electrónico. Se implementó un stack de dos capas con rutas de potencia y señales de control. Las pistas de alimentación se diseñaron con anchos de entre 1,0 mm y 2,0 mm para corrientes de hasta 4 A, mientras que las señales digitales utilizan pistas de 0,25 mm. Se incorporaron planos de masa continuos para mejorar la estabilidad del sistema.
 
 La disposición de componentes sigue una estrategia de flujo de señal lógico, con el microcontrolador ubicado en el centro y los conectores de sensores en los bordes para facilitar el cableado, como se puede observar en la figura \ref{fig:montaje}. Los reguladores de tensión se colocaron cerca de sus cargas correspondientes para minimizar la caída de potencial en las pistas. Los capacitores de desacoplo se ubicaron adyacentes a cada pin de alimentación del microcontrolador para filtrar ruido de alta frecuencia.
+
+El ensamblado se realizó de manera manual en un entorno controlado con temperatura y humedad estables. Todos los componentes se soldaron manualmente con cautín utilizando soldadura con plomo (60/40). Se aplicaron medidas de protección ESD durante todo el proceso y se realizó inspección visual y con lupa para verificar la calidad de las uniones soldadas.
 
 \begin{figure}[H]
     \centering
@@ -296,8 +295,6 @@ La disposición de componentes sigue una estrategia de flujo de señal lógico, 
     \caption{Vistas del circuito impreso (PCB) del sistema.}
     \label{fig:montaje}
 \end{figure}
-
-El ensamblado se realizó de manera manual en un entorno controlado con temperatura y humedad estables. Todos los componentes se soldaron manualmente con cautín utilizando soldadura con plomo (60/40). Se aplicaron medidas de protección ESD durante todo el proceso y se realizó inspección visual y con lupa para verificar la calidad de las uniones soldadas.
 
 \subsection{Pruebas y validación}
 % Describir pruebas de continuidad, consumo, funcionamiento de sensores, etc.
@@ -391,95 +388,78 @@ Esta sección describe el diseño, estructura y funcionamiento de la interfaz gr
 
 \subsection{Diseño de la interfaz de usuario}
 % Describir la disposición visual, estilo, principios de diseño y usabilidad.
-El diseño se desarrolló siguiendo la metodología de diseño \textit{mobile-first}. Se empleó un esquema de colores contrastantes que facilita la lectura de valores y una disposición modular basada en tarjetas.  
-Cada sección agrupa información relacionada, lo que simplifica la navegación y permite una rápida identificación de los estados del sistema.
+El diseño se implementó siguiendo la metodología de diseño \textit{mobile-first}, con un esquema de colores contrastantes que mejora la legibilidad de los valores mostrados. La interfaz se organiza en un diseño modular basado en tarjetas, donde cada sección agrupa información relacionada. Esta estructura no solo optimiza la navegación, sino que también facilita la identificación de los estados del sistema.
 
-\subsection{Seguridad y autenticación}
-% Describir autenticación de usuarios, cifrado, etc.
-Para garantizar la seguridad de las comunicaciones, implementa un mecanismo de autenticación por un token que se obtiene a partir de un login con usuario y contraseña (ver figura \ref{fig:login}).
+El núcleo \texttt{App} contiene dos componentes principales: \texttt{Navbar} y \texttt{Router}. Este último gestiona todas las vistas: \texttt{Login} para autenticación, \texttt{Dashboard} con gráficos y estados de sensores, \texttt{Actuators} para control de actuadores, \texttt{Config} para ajustes avanzados, y \texttt{Logs} con el historial de alertas. Además, se incluye el componente \texttt{AuthProvider}, encargado de gestionar y proporcionar a los distintos componentes las credenciales de acceso al servidor embebido.
+
+La figura \ref{fig:flow} muestra la estructura jerárquica de la aplicación.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.3\textwidth]{./Figures/captures/login.jpeg}
-    \caption{Interfaz de login.}
-    \label{fig:login}
+    \includegraphics[width=1.0\textwidth]{./Figures/ui/flow.png}
+    \caption{Diagrama de la estructura jerárquica de la aplicación.}
+    \label{fig:flow}
+\end{figure}
+
+Cuando el usuario navega entre las diferentes secciones, la aplicación actualiza automáticamente la ruta en la barra de navegación y carga el componente correspondiente. Este, a su vez, obtiene los datos iniciales necesarios de la API y renderiza sus subcomponentes. Para aquellas vistas que requieren sincronización periódica, se activa un bucle de actualización.
+
+La figura \ref{fig:ui} muestra la secuencia de renderizado de una vista.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{./Figures/ui/ui.png}
+    \caption{Diagrama de secuencia de renderizado de una vista.}
+    \label{fig:ui}
+\end{figure}
+
+\subsection{Seguridad y autenticación}
+% Describir autenticación de usuarios, cifrado, etc.
+La seguridad de las comunicaciones se garantiza mediante un sistema de autenticación basado en tokens. Como se ilustra en la figura \ref{fig:login_sec}, cuando el usuario ingresa las credenciales, el componente \texttt{Login} envía una petición POST a la API. Si las credenciales son válidas, la API responde con una clave de acceso que el \texttt{AuthProvider} almacena en el \texttt{localStorage} del navegador. Finalmente, el usuario es redirigido al \texttt{Dashboard}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{./Figures/ui/login.png}    \caption{Diagrama de secuencia del proceso de autenticación.}
+    \label{fig:login_sec}
 \end{figure}
 
 \subsubsection*{Monitoreo de sensores}
 % Explicar qué muestra y cómo se actualiza.
-El panel principal presenta en tiempo real los valores de los sensores de temperatura, humedad, pH, conductividad eléctrica y nivel de solución. Las mediciones se actualizan mediante peticiones periódicas al backend embebido, lo que garantiza una visualización fluida sin recargar la página.
-Adicionalmente, se muestra un gráfico que representa la evolución de los valores de los sensores a lo largo del tiempo (ver figura \ref{fig:sensores_grafico}).
+El panel principal muestra los valores medidos por los sensores. El componente \texttt{Sensors} realiza peticiones periódicas al backend embebido para obtener los datos más recientes cuando el usuario accede a esta sección. Cada sensor se presenta en una tarjeta que muestra su valor actual, unidad de medida y estado, con actualizaciones automáticas cada 1,5 segundos que garantizan la vigencia de la información. La interfaz también incluye indicadores visuales que muestran los estados de carga y los posibles errores en la comunicación con la API.
+
+La figura \ref{fig:sensores} muestra el diagrama de secuencia que describe la interacción entre los componentes durante la carga y actualización de la vista de sensores.
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.3\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{./Figures/captures/sensores_1.jpeg}
-        \caption{Vista inicial de la sección de monitoreo de sensores.}
-        \label{fig:sensores_grafico_a}
-    \end{subfigure}
-    \vspace{1em}
-    \begin{subfigure}[b]{0.3\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{./Figures/captures/sensores_2.jpeg}
-        \caption{Vista final de la sección de monitoreo de sensores.}
-        \label{fig:sensores_grafico_b}
-    \end{subfigure}
-    \vspace{1em}
-    \begin{subfigure}[b]{0.3\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{./Figures/captures/sensores_graficos.jpeg}
-        \caption{Gráfico de los valores de los sensores en el tiempo.}
-        \label{fig:sensores_grafico_c}
-    \end{subfigure}
-    \caption{Interfaz de monitoreo de sensores.}
-    \label{fig:sensores_grafico}
+    \includegraphics[width=1.0\textwidth]{./Figures/ui/sensores.png}
+    \caption{Diagrama de secuencia de la vista de monitoreo de sensores.}
+    \label{fig:sensores}
 \end{figure}
 
 \subsubsection*{Control de actuadores}
 % Describir cómo el usuario controla actuadores o configuraciones.
-En esta vista, el usuario tiene la capacidad de activar o desactivar manualmente los actuadores, como la bomba de riego, la iluminación y la ventilación, mientras visualiza el estado actual de cada uno de ellos (ver figura \ref{fig:actuadores}). Las acciones se transmiten al backend embebido mediante solicitudes \texttt{POST} y \texttt{GET} a los endpoints correspondientes.
+En esta vista, el usuario tiene la capacidad de activar o desactivar manualmente los actuadores, como la bomba de riego, la iluminación y la ventilación, mientras visualiza el estado actual de cada uno de ellos (ver figura \ref{fig:actuadores_sec}). Las acciones se transmiten al backend embebido mediante solicitudes \texttt{POST} y \texttt{GET} a los endpoints correspondientes.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.3\textwidth]{./Figures/captures/actuadores.jpeg}
-    \caption{Vista de control de actuadores.}
-    \label{fig:actuadores}
+    \includegraphics[width=1.0\textwidth]{./Figures/ui/actuadores.png}
+    \caption{Diagrama de secuencia de la vista de control de actuadores.}
+    \label{fig:actuadores_sec}
 \end{figure}
 
 \subsubsection*{Configuración del sistema}
 % Explicar cómo se gestionan los parámetros del sistema.
-El panel de configuración permite modificar umbrales de alarma, períodos de riego o ventilación y horario de iluminación (ver figura \ref{fig:configuracion}). Una vez confirmados los cambios, el sistema actualiza el archivo \texttt{config.json} en memoria flash y propaga los nuevos valores a los controladores correspondientes.
+El panel de configuración permite modificar umbrales de alarma, períodos de riego o ventilación y horario de iluminación (ver figura \ref{fig:configuracion_sec}). Una vez confirmados los cambios, el sistema actualiza el archivo \texttt{config.json} en memoria flash y propaga los nuevos valores a los controladores correspondientes.
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.3\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{./Figures/captures/config_1.jpeg}
-        \caption{Vista inicial de la sección de configuración.}
-        \label{fig:configuracion_a}
-    \end{subfigure}
-    \vspace{1em}
-    \begin{subfigure}[b]{0.3\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{./Figures/captures/config_2.jpeg}
-        \caption{Vista final de la sección de configuración.}
-        \label{fig:configuracion_b}
-    \end{subfigure}
-    \caption{Sección de configuración del sistema.}
-    \label{fig:configuracion}
+    \includegraphics[width=1.0\textwidth]{./Figures/ui/configuracion.png}
+    \caption{Diagrama de secuencia de la vista de configuración.}
+    \label{fig:configuracion_sec}
 \end{figure}
 
 \subsection{Logs del sistema}
 % Explicar endpoints y métodos principales.
-Por ultimo, el panel de logs muestra los eventos relevantes del sistema, como errores y advertencias (ver figura \ref{fig:logs}).
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.3\textwidth]{./Figures/captures/logs.jpeg}
-    \caption{Logs del sistema.}
-    \label{fig:logs}
-\end{figure}
+Por último, el panel de logs muestra los eventos relevantes del sistema, como errores y advertencias. Incluye un botón de limpieza que permite vaciar el registro de eventos cuando sea necesario.
 
 \subsection{Compatibilidad y optimización}
 % Mencionar compatibilidad con dispositivos y rendimiento.

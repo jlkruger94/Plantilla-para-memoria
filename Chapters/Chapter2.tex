@@ -16,7 +16,7 @@ En esta sección se describen los módulos de hardware de terceros utilizados en
 \subsection{ESP32-DevKitC}
 %https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/index.html
 
-La placa ESP32-DevKitC V4, figura \ref{fig:devkit}, es una placa de desarrollo basada en el SoC (\textit{System On Chip}) ESP32 de Espressif Systems. Es una placa popular y versátil ampliamente utilizada por desarrolladores, ingenieros y aficionados para la creación de prototipos y el desarrollo de proyectos de internet de las cosas o IoT (del inglés \textit{Internet of Things}), sistemas embebidos y otras aplicaciones \cite{DEV:KIT}.
+La placa ESP32-DevKitC V4, figura \ref{fig:devkit}, es una placa de desarrollo basada en el SoC (\textit{System On Chip}) ESP32 de Espressif Systems. Es una placa popular y versátil ampliamente utilizada por desarrolladores, ingenieros y aficionados para la creación de prototipos y el desarrollo de proyectos de internet de las cosas o IoT (del inglés, \textit{Internet of Things}), sistemas embebidos y otras aplicaciones \cite{DEV:KIT}.
 
 Cacterísticas generales:
 
@@ -25,7 +25,7 @@ Cacterísticas generales:
 	\item Microcontrolador con arquitectura de uno o dos núcleos de 32 bits con velocidades de reloj de hasta 240 MHz.
 	\item Memoria SRAM integrada.
 	%\item Memoria flash integrada para almacenamiento de firmware.
-	\item Conectividad Wi-Fi 802.11 b/g/n (2.4 GHz) integrada.
+	\item Conectividad Wi-Fi 802.11 b/g/n (2,4 GHz) integrada.
 	\item Conectividad bluetooth (classic y low energy) integrada.
 	%\item La mayoría de los pines I/O del módulo ESP32 están disponibles a través de pines header para una fácil conexión.
 	%\item Permite la conexión de periféricos con cables jumper o el montaje en una placa de pruebas.
@@ -34,15 +34,15 @@ Cacterísticas generales:
 	%\item Compatible con múltiples entornos de desarrollo (ESP-IDF, Arduino IDE, MicroPython).
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
-\includegraphics[scale=.5]{./Figures/devkit.png}
+\includegraphics[scale=.4]{./Figures/devkit.png}
 	\caption{ESP32-DevKitC V4 con el módulo ESP32-WROOM-32 integrado\protect\footnotemark.}
 	\label{fig:devkit}
 \end{figure}
 
 \footnotetext{Imagen tomada de \href{https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html\#overview}
-{https://docs.espressif.com}}
+{https://docs.espressif.com}.}
 
 
 
@@ -54,7 +54,7 @@ Características:
 \begin{itemize}
 	%\item Módulo electrónico compatible con electrodos de pH con conector BNC.
 	\item Rango de detección de pH de 0 a 14.
-	\item Salida analógica que varía, entre 0 y 5 VDC, con el pH del liquido.
+	\item Salida analógica que varía, entre 0 y 5 VDC, con el pH del líquido.
 	%\item Requiere una alimentación de voltaje de 5V DC.
 	%\item Corriente de operación entre 5 y 10 mA.
 	\item Temperatura de operación del módulo generalmente entre -10 °C y 50 °C.
@@ -71,14 +71,23 @@ Características:
 
 
 \footnotetext{Imagen tomada de \href{https://uelectronics.com/producto/sensor-de-ph-liquido/?srsltid=AfmBOop9186NUUqLe2lmdM_tZTSfz79gsdcGSMFpg6aQvBxj-Fu9oF5t}
-{https://uelectronics.com/producto/sensor-de-ph-liquido/}}
+{https://uelectronics.com/producto/sensor-de-ph-liquido/}.}
 
 
 %https://uelectronics.com/producto/sensor-de-ph-liquido/?srsltid=AfmBOop9186NUUqLe2lmdM_tZTSfz79gsdcGSMFpg6aQvBxj-Fu9oF5t
 
 \subsection{Módulo medidor de sólidos disueltos totales}
 
-El medidor de sólidos disueltos totales o TDS (del inglés \textit{Total Dissolved Solids}) Meter 1.0, figura \ref{fig:tds}, es un sensor o módulo electrónico diseñado para medir la cantidad total de sustancias orgánicas e inorgánicas disueltas en un líquido, expresada típicamente en partes por millón (ppm) o miligramos por litro (mg/l) \cite{TDS}. Este tipo de sensor se utiliza para evaluar la calidad del agua en diversas aplicaciones como hidroponía, acuicultura, tratamiento de aguas y monitoreo ambiental.
+El medidor de sólidos disueltos totales (TDS, del inglés \textit{Total Dissolved Solids}) Meter 1.0 (figura \ref{fig:tds}) es un sensor electrónico diseñado para medir la cantidad total de sustancias orgánicas e inorgánicas disueltas en un líquido, lo que se expresa típicamente en partes por millón (ppm) o miligramos por litro (mg/l) \cite{TDS}. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=.5]{./Figures/tds.png}
+    \caption{Ilustración del módulo sensor TDS meter v1.0\protect\footnotemark.}
+    \label{fig:tds}
+\end{figure}
+
+Este sensor se emplea para evaluar la calidad del agua en aplicaciones como hidroponía, acuicultura, tratamiento de aguas y monitoreo ambiental.
 
 Características:
 
@@ -93,22 +102,15 @@ Características:
 \end{itemize}
 
 
-\begin{figure}[h]
-\centering
-\includegraphics[scale=.5]{./Figures/tds.png}
-	\caption{Ilustración del módulo sensor TDS meter v1.0\protect\footnotemark.}
-	\label{fig:tds}
-\end{figure}
-
 \footnotetext{Imagen tomada de \href{https://www.digikey.be/htmldatasheets/production/2799469/0/0/1/sen0244.html}
-{https://www.digikey.be/htmldatasheets}}
+{https://www.digikey.be/htmldatasheets}.}
 
 \subsection{Sensor de humedad capacitivo V2.0}
 
 El sensor de humedad capacitivo V2.0, figura \ref{fig:moisture}, mide los niveles de humedad mediante detección capacitiva en lugar de resistiva, como otros sensores disponibles. Fabricado con material resistente a la corrosión, ofrece una vida útil prolongada al insertarse en el sustrato alrededor de las plantas \cite{MOISTURE}.
 
 \begin{itemize}
-	\item Requiere alimentación de 3,3 a 5,5 VDC.
+	\item Requiere alimentación entre 3,3 y 5,5 VDC.
 	\item Corriente de operación de 5 mA.
 	\item Salida analógica.
 	%\item Incluye un regulador de tensión integrado compatible con MCUs de 3.3V y 5V.
@@ -123,7 +125,7 @@ El sensor de humedad capacitivo V2.0, figura \ref{fig:moisture}, mide los nivele
 \end{figure}
 
 \footnotetext{Imagen tomada de \href{https://probots.co.in/soil-moisture-sensor-capacitive-v1-2.html}
-{https://probots.co.in/}}
+{https://probots.co.in/}.}
 
 \subsection{Sensor de temperatura digital DS18B20}
 
@@ -144,7 +146,7 @@ Características:
 \end{itemize}
 
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \includegraphics[scale=.5]{./Figures/ds18b20.png}
 	\caption{Pinout del sensor DS18B20 y presentación del chip con su vaina protectora característica\protect\footnotemark.}
@@ -153,7 +155,7 @@ Características:
 
 
 \footnotetext{Imagen tomada de \href{https://tienda.ityt.com.ar/sensor-temp-hum-ic/1694-sensor-temperatura-ds18b20-18b20-1-wire-one-wire-itytarg.html}
-{https://tienda.ityt.com.ar/sensor-temp-hum-ic/}}
+{https://tienda.ityt.com.ar/sensor-temp-hum-ic/}.}
 
 %https://tienda.ityt.com.ar/sensor-temp-hum-ic/1694-sensor-temperatura-ds18b20-18b20-1-wire-one-wire-itytarg.html
 
@@ -179,7 +181,7 @@ El circuito integrado BH1750, figura \ref{fig:BH1750}, es un sensor de luz ambie
 
 
 \footnotetext{Imagen tomada de \href{https://mytectutor.com/bh1750-ambient-light-sensor-with-arduino/}
-{https://mytectutor.com/}}
+{https://mytectutor.com/}.}
 
 
 \subsection{Raspberry Pi}
