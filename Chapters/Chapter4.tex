@@ -2,15 +2,15 @@
 
 \chapter{Ensayos y resultados} % Main chapter title
 
-En este capítulo se presentan las pruebas y ensayos realizados sobre el sistema de monitoreo y gestión  de cultivos hidropónicos verticales desarrollado.  
-El objetivo principal fue verificar el correcto funcionamiento del hardware y firmware, así como validar el cumplimiento de los requerimientos funcionales definidos en las etapas de diseño.
-Cabe destacar que en este capítulo se presentan casos de prueba representativos, seleccionados de acuerdo con su relevancia para demostrar el funcionamiento del sistema. La metodología descrita se aplicó de manera consistente en todos los ensayos realizados.
+En este capítulo se presentan las pruebas y ensayos que se realizaron sobre el sistema de monitoreo y gestión de cultivos hidropónicos verticales desarrollado.  
+El objetivo principal consistió en verificar el correcto funcionamiento del hardware, firmware y la interfaz de usuario, además de validar el cumplimiento de los requerimientos funcionales definidos en las etapas de diseño.
+Cabe destacar que en este capítulo se presentan casos de prueba representativos, seleccionados por su relevancia para demostrar el funcionamiento del sistema. La metodología descrita se aplicó de manera consistente en todos los ensayos realizados.
 
 \section{Pruebas del firmware}
 Antes de la implementación en la PCB, se validaron los componentes del firmware. Cada funcionalidad se evaluó de manera aislada mediante pruebas unitarias para verificar su funcionamiento antes de la integración del sistema.
 
 \subsection{Pruebas unitarias}
-Se implementaron pruebas unitarias utilizando \textit{Ceedling} sobre los \textit{drivers} y componentes del firmware. Este enfoque permitió automatizar la ejecución de pruebas a medida que se fue desarrollando el código. 
+Se implementaron pruebas unitarias utilizando Ceedling sobre los \textit{drivers} y componentes del firmware. Este enfoque permitió automatizar la ejecución de pruebas a medida que se fue desarrollando el código. 
 
 En la figura \ref{fig:cobertura_codigo} se puede observar el resultado de las pruebas realizadas sobre el \textit{driver} del sensor DS18B20.
 
@@ -28,26 +28,20 @@ La validación del sistema de mensajería confirmó la correcta distribución de
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{1.0\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{./Figures/test/suscripcion.png}
-        \caption{Proceso de suscripción a canales.}
-        \label{fig:suscripcion}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{1.0\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{./Figures/test/full_queue.png}
-        {\small \caption{Manejo de desbordamiento del buffer.}
-        \label{fig:buffer_overflow}}
-    \end{subfigure}
-    \caption{Resultados de las pruebas del sistema de mensajería.}
-    \label{fig:pruebas_mensajeria}
+    \includegraphics[width=\textwidth]{./Figures/test/suscripcion.png}
+    \caption{Proceso de suscripción a canales.}
+    \label{fig:suscripcion}
 \end{figure}
 
 Como se muestra en la figura \ref{fig:buffer_overflow}, cuando el buffer alcanza su capacidad máxima, el sistema descarta automáticamente los mensajes más antiguos sin interrumpir el flujo de comunicación. Este comportamiento se observa claramente al triplicar el tiempo entre lecturas, lo que permite verificar el correcto manejo de desbordamiento.
 Finalmente, se estableció una relación 1:1 entre publicadores y suscriptores, lo que permitió mantener estable cada canal y garantizar un flujo de información equilibrado.
     
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./Figures/test/full_queue.png}
+    \caption{Manejo de desbordamiento del buffer.}
+    \label{fig:buffer_overflow}
+\end{figure}
 
 \subsubsection{API REST con Postman}
 Se desarrollaron pruebas de integración para los endpoints REST expuestos por el sistema, organizados por funcionalidad.
@@ -101,7 +95,7 @@ En la figura \ref{fig:config_sin_token} se muestra la respuesta del servidor al 
 \end{figure}
 
 \subsubsection{Gestión de logs}
-Se verificó el sistema de rotación de logs, que incluyó la rotación automática al alcanzar el tamaño máximo configurado, la conservación de los registros más recientes según la política de retención establecida, el mantenimiento de un formato consistente en todos los mensajes de registro y la implementación de niveles de severidad apropiados (DEBUG, INFO, WARN, ERROR, ALERT) para una mejor clasificación y filtrado de los eventos registrados.
+Se verificó el sistema de rotación de logs, que incluyó la rotación automática al alcanzar el tamaño máximo configurado, la conservación de los registros más recientes según la política de retención establecida, el mantenimiento de un formato consistente en todos los mensajes de registro y la implementación de niveles de severidad apropiados (\texttt{DEBUG}, \texttt{INFO}, \texttt{WARN}, \texttt{ERROR}, \texttt{ALERT}) para una mejor clasificación y filtrado de los eventos registrados.
 
 \subsubsection{Comunicación con la nube}
 Se implementó un sistema de envío de datos a un servidor backend mediante peticiones HTTP POST. El sistema utiliza un único endpoint para el envío de datos, con un esquema JSON que incluye todos los parámetros del sistema.
@@ -398,11 +392,11 @@ A continuación, se detallan los requerimientos funcionales validados y las prue
     
     \item Monitoreo de variables ambientales: se validó la precisión y confiabilidad del sistema de adquisición de datos mediante la comparación con instrumentos de referencia calibrados. Se utilizó un termómetro digital (precisión $\pm 0.1$ °C), dos soluciones buffer de pH (precisión $\pm 0.02$) y un conductímetro de mercado (precisión $\pm 2\,\mu$S/cm) como estándares de referencia. Las mediciones se realizaron en condiciones controladas de laboratorio, con un banco de pruebas que simulaba las condiciones del cultivo. Se evaluaron diferentes configuraciones de parámetros ambientales, que incluyeron temperatura, humedad y composición de la solución nutritiva. Las mediciones mostraron una concordancia aceptable con los instrumentos de referencia, lo que confirmó la precisión del sistema de medición en condiciones controladas. Todos los valores medidos se mantuvieron dentro de los rangos especificados: temperatura ($\pm 0.8$ °C), humedad del sustrato (sin patrón de referencia, $\pm 2.5 \%$ de precisión según especificaciones del fabricante), nivel de solución nutritiva (mínimo 3/4 del contenedor), conductividad eléctrica ($\pm 0.1$ mS/cm) y pH ($\pm 0.1$).
     
-    \item Activación manual de secuencias de riego: Se realizaron 10 pruebas consecutivas en las que se midió el tiempo de respuesta desde la interacción del usuario en la interfaz hasta la activación del sistema de riego. Los resultados mostraron un tiempo promedio de respuesta de 1,2 segundos, lo que cumple con el requerimiento de menos de 2 segundos.
+    \item Activación manual de secuencias de riego: se realizaron 10 pruebas consecutivas en las que se midió el tiempo de respuesta desde la interacción del usuario en la interfaz hasta la activación del sistema de riego. Los resultados mostraron un tiempo promedio de respuesta de 1,2 segundos, lo que cumple con el requerimiento de menos de 2 segundos.
     
     \item Servidor embebido: se realizaron pruebas de disponibilidad en diferentes momentos del día. El servidor se mantuvo en funcionamiento continuo durante 72 horas, período en el que se monitoreó su rendimiento con peticiones HTTP cada 2 segundos. El sistema demostró un 100\% de disponibilidad.
     
-    \item Interfaz gráfica accesible desde móviles: Las pruebas en diferentes dispositivos móviles (Android) y navegadores (Chrome, Firefox) mostraron tiempos de carga promedio de 200 ms en conexiones Wi-Fi, lo que cumple con el requerimiento de menos de 5 segundos.
+    \item Interfaz gráfica accesible desde móviles: las pruebas en diferentes dispositivos móviles (Android) y navegadores (Chrome, Firefox) mostraron tiempos de carga promedio de 200 ms en conexiones Wi-Fi, lo que cumple con el requerimiento de menos de 5 segundos.
     
     \item Programación de secuencias de riego: se configuraron múltiples secuencias de riego con diferentes parámetros (por tiempo, humedad del sustrato, horarios específicos). La precisión de ejecución se verificó con un reloj atómico como referencia, lo que permitió alcanzar una precisión de $\pm 1$ segundo, con lo que se superó el requerimiento de $\pm 1$ minuto.
 \end{itemize}
@@ -413,7 +407,7 @@ El banco de pruebas, mostrado en la figura \ref{fig:montaje_pruebas}, se configu
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{./Figures/test/Setup.png}
+\includegraphics[width=\textwidth]{./Figures/test/Setup.png}
 \caption{Configuración del banco de pruebas con los componentes principales del sistema.}
 \label{fig:montaje_pruebas}
 \end{figure}
