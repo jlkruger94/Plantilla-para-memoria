@@ -266,13 +266,19 @@ I (42446) hydro_rest: Todos los endpoints REST registrados correctamente
 %    \label{fig:inicializacion}
 %\end{figure}
 
+%==============================================================
 \section{Pruebas del hardware}
 
-Se realizaron pruebas funcionales sobre la PCB desarrollada y los componentes asociados, con el objetivo de validar la correcta operación eléctrica y la integridad de las señales entre módulos.
+Se realizaron pruebas funcionales sobre la PCB desarrollada y los componentes asociados, con el objetivo de validar la operación eléctrica correcta y la integridad de las señales entre módulos.
 
 \subsection{Verificación eléctrica}
 Se midieron las tensiones de alimentación y los niveles lógicos en cada etapa. Los resultados se mantuvieron dentro de los márgenes de diseño (5,1 V y 3,3 V regulados).  
-Las salidas de actuadores se probaron mediante una lámpara para evaluar visualmente la acción de cada controlador. Además, se verificó el correcto funcionamiento de los LEDs indicadores integrados en la placa para cada actuador.
+Las salidas de actuadores se probaron mediante una lámpara para evaluar de forma visual la acción de cada controlador. Además, se verificó el funcionamiento correcto de los LEDs indicadores integrados en la placa para cada actuador.
+
+\subsection{Validación funcional}
+% Describir pruebas de continuidad, consumo, funcionamiento de sensores, etc.
+Se realizaron pruebas eléctricas de continuidad y verificación de polaridades antes de alimentar el circuito. La placa se energizó sin los módulos y se midieron las tensiones en todos los puntos de alimentación para validar el funcionamiento correcto de los reguladores. Posteriormente, se realizaron pruebas funcionales para validar la operación correcta de los sensores, actuadores y módulos de comunicación.  
+Los resultados confirmaron el rendimiento correcto del sistema bajo condiciones normales de operación.
 
 %AÑADIR UNA TABLA CON LOS NIVELES DE TENSION Y CORRIENTE MEDIDOS EN CADA ETAPA
 
@@ -280,6 +286,93 @@ Las salidas de actuadores se probaron mediante una lámpara para evaluar visualm
 Se verificó el correcto funcionamiento del sistema de protección contra sobrecorriente. Tras desconectar los módulos de la PCB, se conectó una carga variable en serie con un amperímetro. Este montaje permitió incrementar gradualmente la corriente mientras se monitoreaba la tensión de salida. El umbral de corte se activó en 0,5 $\pm 0.1$ A, valor acorde a las especificaciones del componente. La corriente de fuga en condiciones normales se mantuvo dentro de los márgenes de seguridad, y el fusible auto-resetable restableció la operación al normalizarse la corriente.
 
 %======================
+\section{Pruebas de la interfaz gráfica}
+
+Se realizaron pruebas cualitativas de la interfaz gráfica que validaron su funcionamiento. Las pruebas incluyeron la verificación de la responsividad, la navegación entre secciones, las peticiones al servidor embebido y el manejo de casos de error.
+
+\subsection{Pruebas de autenticación}
+Se validó el proceso de inicio de sesión mediante credenciales. La figura \ref{fig:login} muestra la pantalla de autenticación, que incluye campos para usuario y contraseña. La interfaz mostró un comportamiento consistente en diferentes tamaños de pantalla y se adaptó correctamente a dispositivos móviles y de escritorio.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{./Figures/captures/login.jpeg}
+    \caption{Pantalla de inicio de sesión del sistema.}
+    \label{fig:login}
+\end{figure}
+
+\subsection{Monitoreo y actualización de datos}
+La interfaz mostró los datos de los sensores y permitió su actualización mediante peticiones al servidor embebido. La figura \ref{fig:sensores_grafico} muestra las diferentes vistas de monitoreo.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/sensores_1.jpeg}
+        \caption{Vista de sensores 1.}
+        \label{fig:sensores_grafico_a}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/sensores_2.jpeg}
+        \caption{Vista de sensores 2.}
+        \label{fig:sensores_grafico_b}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/sensores_graficos.jpeg}
+        \caption{Gráficos de sensores.}
+        \label{fig:sensores_grafico_c}
+    \end{subfigure}
+    \caption{Vistas de monitoreo de sensores.}
+    \label{fig:sensores_grafico}
+\end{figure}
+
+\subsection{Control de actuadores}
+Se probó el control de actuadores a través de la interfaz. La figura \ref{fig:actuadores} muestra la sección de control.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{./Figures/captures/actuadores.jpeg}
+    \caption{Interfaz de control de actuadores.}
+    \label{fig:actuadores}
+\end{figure}
+
+\subsection{Configuración del sistema}
+La interfaz permitió modificar la configuración del sistema. La figura \ref{fig:configuracion} muestra las pantallas de configuración.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.30\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/config_1.jpeg}
+        \caption{Menú de configuración.}
+        \label{fig:configuracion_a}
+    \end{subfigure}
+    \hspace{0.04\textwidth}
+    \begin{subfigure}[b]{0.30\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./Figures/captures/config_2.jpeg}
+        \caption{Opciones de configuración.}
+        \label{fig:configuracion_b}
+    \end{subfigure}
+    \vspace{1em}
+    \caption{Pantallas de configuración.}
+    \label{fig:configuracion}
+\end{figure}
+
+\subsection{Registro de eventos}
+La interfaz incluye un registro de eventos del sistema, como se muestra en la figura \ref{fig:logs}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{./Figures/captures/logs.jpeg}
+    \caption{Registro de eventos del sistema.}
+    \label{fig:logs}
+\end{figure}
+
+%==============================================================
 \section{Pruebas de integración}
 
 Una vez validados los módulos individuales, se realizaron pruebas de integración para verificar el funcionamiento conjunto del hardware, firmware e interfaz web, con el objetivo de analizar la comunicación y sincronización entre las tareas del firmware (monitores, controladores y servidor embebido). Estas pruebas permitieron validar la interacción entre los componentes del sistema, la estabilidad de la comunicación en condiciones controladas, la coherencia de los datos transmitidos y la correcta ejecución de las acciones automáticas. En la figura \ref{fig:dashboard} se muestra la vista de sensores de la interfaz web, donde se pueden visualizar los valores medidos en tiempo real.
