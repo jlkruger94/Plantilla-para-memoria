@@ -267,7 +267,7 @@ Las salidas de actuadores se probaron mediante una lámpara para evaluar de form
 \subsection{Validación funcional}
 % Describir pruebas de continuidad, consumo, funcionamiento de sensores, etc.
 Se realizaron pruebas eléctricas de continuidad y verificación de polaridades antes de alimentar el circuito. La placa se energizó sin los módulos y se midieron las tensiones en todos los puntos de alimentación para validar el funcionamiento correcto de los reguladores. Posteriormente, se realizaron pruebas funcionales para validar la operación correcta de los sensores, actuadores y módulos de comunicación.  
-Los resultados confirmaron el rendimiento correcto del sistema bajo condiciones normales de operación.
+Los resultados confirmaron el correcto funcionamiento del sistema en condiciones normales de operación.
 
 %AÑADIR UNA TABLA CON LOS NIVELES DE TENSION Y CORRIENTE MEDIDOS EN CADA ETAPA
 
@@ -277,7 +277,7 @@ Se verificó el correcto funcionamiento del sistema de protección contra sobrec
 %======================
 \section{Pruebas de la interfaz gráfica}
 
-Se realizaron pruebas cualitativas de la interfaz gráfica que validaron su funcionamiento. Las pruebas incluyeron la verificación de la responsividad, la navegación entre secciones, las peticiones al servidor embebido y el manejo de casos de error.
+Se realizaron pruebas de la interfaz gráfica que abarcaron todas sus funcionalidades. Dichas pruebas incluyeron la validación de la interfaz de usuario, la responsividad en diferentes dispositivos y resoluciones, la navegación entre secciones, el correcto envío y recepción de datos al servidor embebido y el manejo adecuado de casos de error.
 
 \subsection{Pruebas de autenticación}
 Se validó el proceso de inicio de sesión mediante credenciales. La figura \ref{fig:login} muestra la pantalla de autenticación, que incluye campos para usuario y contraseña. La interfaz mostró un comportamiento consistente en diferentes tamaños de pantalla y se adaptó correctamente a dispositivos móviles y de escritorio.
@@ -290,7 +290,7 @@ Se validó el proceso de inicio de sesión mediante credenciales. La figura \ref
 \end{figure}
 
 \subsection{Monitoreo y actualización de datos}
-La interfaz mostró los datos de los sensores y permitió su actualización mediante peticiones al servidor embebido. La figura \ref{fig:sensores_grafico} muestra las diferentes vistas de monitoreo.
+Cada magnitud se mostró correctamente en una tarjeta independiente con su valor, unidad, icono identificativo y fecha de actualización. La figura \ref{fig:sensores_grafico} muestra esta disposición organizada.
 
 \begin{figure}[H]
     \centering
@@ -319,7 +319,7 @@ La interfaz mostró los datos de los sensores y permitió su actualización medi
 \end{figure}
 
 \subsection{Control de actuadores}
-Se probó el control de actuadores a través de la interfaz. La figura \ref{fig:actuadores} muestra la sección de control.
+Se validó la vista de control de actuadores con tres componentes: bomba de agua, ventilador y luces. Cada uno mostró su estado en la parte superior y un botón que cambia de color (rojo para apagar, verde para encender). La figura \ref{fig:actuadores} muestra la bomba apagada, y el ventilador y luces encendidos.
 
 \begin{figure}[H]
     \centering
@@ -329,7 +329,7 @@ Se probó el control de actuadores a través de la interfaz. La figura \ref{fig:
 \end{figure}
 
 \subsection{Configuración del sistema}
-La interfaz permitió modificar la configuración del sistema. La figura \ref{fig:configuracion} muestra las pantallas de configuración.
+La interfaz permitió modificar la configuración del sistema a través de un formulario con múltiples campos de entrada. Cada campo incluyó validación básica y mostró el teclado correspondiente según el tipo de dato requerido. La figura \ref{fig:configuracion} muestra las vistas de configuración disponibles.
 
 
 \begin{figure}[H]
