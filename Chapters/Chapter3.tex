@@ -132,7 +132,12 @@ Al encender el sistema por primera vez, se configura automáticamente el acceso 
 Una vez establecida la conexión, se inicia el servidor embebido y se habilita la interacción con la aplicación móvil.
 
 \subsection{Estructura del código}
-La arquitectura sigue el patrón modular con módulos de software que ejecutan tareas de forma ordenada. El ciclo comienza en \texttt{main.c} con la inicialización del sistema a través del componente \texttt{Administrator}, como se detalla en la figura \ref{fig:flujo:sistema}.
+La arquitectura sigue el patrón modular con módulos de software que ejecutan tareas de forma ordenada. El ciclo comienza en \texttt{main.c} con la inicialización del sistema a través del componente \texttt{Administrator}.
+
+\subsubsection*{Inicialización del sistema}
+La función \texttt{app\_main()}, figura \ref{fig:flujo:sistema}, crea la tarea \texttt{administrator\_callback} con alta prioridad, que actúa como un coordinador general que gestiona la interacción entre módulos y subsistemas.
+
+Durante la inicialización, el \texttt{Administrator} configura el pool de memoria, inicializa el sistema de archivos, establece la conectividad Wi-Fi e inicia el servidor web.
 
 \begin{figure}[H]
     \centering
@@ -140,11 +145,6 @@ La arquitectura sigue el patrón modular con módulos de software que ejecutan t
         \caption{Diagrama simplificado del ciclo de ejecución del programa.}
         \label{fig:flujo:sistema}
     \end{figure}
-
-\subsubsection*{Inicialización del sistema}
-La función \texttt{app\_main()} crea la tarea \texttt{administrator\_callback} con alta prioridad, que actúa como un coordinador general que gestiona la interacción entre módulos y subsistemas.
-
-Durante la inicialización, el \texttt{Administrator} configura el pool de memoria, inicializa el sistema de archivos, establece la conectividad Wi-Fi e inicia el servidor web.
 
 \subsubsection*{Configuración de hora y alarmas}
 El sistema incorpora un módulo RTC (\textit{Real Time Clock}) que garantiza precisión temporal durante interrupciones de energía. Además, inicializa un sistema de alarmas con niveles de severidad variables y persiste los mensajes en archivo para evitar pérdida de información tras reinicios.
@@ -267,8 +267,6 @@ El diseño del PCB se basa en principios prácticos de diseño electrónico. Se 
 
 La disposición de componentes sigue una estrategia de flujo de señal lógico, con el microcontrolador ubicado en el centro y los conectores de sensores en los bordes para facilitar el cableado, como se puede observar en la figura \ref{fig:montaje}. Los reguladores de tensión se colocaron cerca de sus cargas correspondientes para minimizar la caída de potencial en las pistas. Los capacitores de desacoplo se ubicaron adyacentes a cada pin de alimentación del microcontrolador para filtrar ruido de alta frecuencia.
 
-El ensamblado se realizó de manera manual en un entorno controlado con temperatura y humedad estables. Todos los componentes se soldaron manualmente con cautín utilizando soldadura con plomo (60/40). Se aplicaron medidas de protección ESD durante todo el proceso y se realizó inspección visual y con lupa para verificar la calidad de las uniones soldadas.
-
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.40\textwidth}
@@ -295,6 +293,8 @@ El ensamblado se realizó de manera manual en un entorno controlado con temperat
     \caption{Vistas del circuito impreso (PCB) del sistema.}
     \label{fig:montaje}
 \end{figure}
+
+El ensamblado se realizó de manera manual en un entorno controlado con temperatura y humedad estables. Todos los componentes se soldaron manualmente con cautín utilizando soldadura con plomo (60/40). Se aplicaron medidas de protección ESD durante todo el proceso y se realizó inspección visual y con lupa para verificar la calidad de las uniones soldadas.
 
 \subsection{Consideraciones de seguridad y mantenimiento}
 % Explicar protecciones, aislamiento, mantenimiento preventivo, etc.
@@ -436,7 +436,7 @@ En esta vista, el usuario tiene la capacidad de activar o desactivar manualmente
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.2\textwidth]{./Figures/ui/actuadores.png}
+    \includegraphics[width=0.5\textwidth]{./Figures/ui/actuadores.png}
     \caption{Diagrama de secuencia de la vista de control de actuadores.}
     \label{fig:actuadores_sec}
 \end{figure}

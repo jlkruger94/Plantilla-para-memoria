@@ -456,10 +456,10 @@ KOMA-script documentation for details.}]{fancyhdr}
 \newcaptionname{spanish}{\abbrevname}{Glosario}
 \newcaptionname{spanish}{\byname}{por}
 
-\addto\captionsspanish{%
-	\renewcommand{\listtablename}{\'{I}ndice de tablas}
-	\renewcommand{\tablename}{Tabla} 
-}
+%\addto\captionsspanish{%
+%	\renewcommand{\listtablename}{\'{I}ndice de tablas}
+%	\renewcommand{\tablename}{Tabla} 
+%}
 
 \captionsetup[figure]{labelformat=simple, labelsep=period}
 \captionsetup[table]{labelformat=simple, labelsep=period}
