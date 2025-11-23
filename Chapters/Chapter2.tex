@@ -16,7 +16,7 @@ En esta sección se describen los módulos de hardware de terceros utilizados en
 \subsection{ESP32-DevKitC}
 %https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/index.html
 
-La placa ESP32-DevKitC V4, figura \ref{fig:devkit}, es una placa de desarrollo basada en el SoC (\textit{System On Chip}) ESP32 de Espressif Systems. Es una placa popular y versátil ampliamente utilizada por desarrolladores, ingenieros y aficionados para la creación de prototipos y el desarrollo de proyectos de internet de las cosas o IoT (del inglés, \textit{Internet of Things}), sistemas embebidos y otras aplicaciones \cite{DEV:KIT}.
+La placa ESP32-DevKitC V4, que se muestra en la figura \ref{fig:devkit}, es una placa de desarrollo basada en el SoC (\textit{System On Chip}) ESP32 de Espressif Systems. Es una placa popular y versátil ampliamente utilizada por desarrolladores, ingenieros y aficionados para la creación de prototipos y el desarrollo de proyectos de internet de las cosas o IoT (del inglés, \textit{Internet of Things}), sistemas embebidos y otras aplicaciones \cite{DEV:KIT}.
 
 Cacterísticas generales:
 
@@ -36,7 +36,7 @@ Cacterísticas generales:
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=.4]{./Figures/devkit.png}
+\includegraphics[scale=.35]{./Figures/devkit.png}
 	\caption{ESP32-DevKitC V4 con el módulo ESP32-WROOM-32 integrado\protect\footnotemark.}
 	\label{fig:devkit}
 \end{figure}
@@ -47,7 +47,7 @@ Cacterísticas generales:
 
 
 \subsection{Módulo sensor PH-4502C}
-El sensor de pH analógico PH-4502C, figura \ref{fig:ph}, es un módulo electrónico diseñado para medir el grado de acidez de soluciones líquidas, típicamente el modelo E201-BNC \cite{PH:4502C}. Este sensor proporciona una salida de tensión analógica que es proporcional al nivel de pH detectado por el electrodo.
+El sensor de pH analógico PH-4502C, que se muestra en la figura \ref{fig:ph}, es un módulo electrónico diseñado para medir el grado de acidez de soluciones líquidas, típicamente el modelo E201-BNC \cite{PH:4502C}. Este sensor proporciona una salida de tensión analógica que es proporcional al nivel de pH detectado por el electrodo.
 
 Características:
 
@@ -78,7 +78,7 @@ Características:
 
 \subsection{Módulo medidor de sólidos disueltos totales}
 
-El medidor de sólidos disueltos totales o TDS (del inglés, \textit{Total Dissolved Solids}) Meter 1.0 (figura \ref{fig:tds}) es un sensor electrónico diseñado para medir la cantidad total de sustancias orgánicas e inorgánicas disueltas en un líquido, lo que se expresa típicamente en partes por millón (ppm) o miligramos por litro (mg/l) \cite{TDS}. 
+El medidor de sólidos disueltos totales o TDS (del inglés, \textit{Total Dissolved Solids}) Meter 1.0, que se muestra en la figura \ref{fig:tds}, es un sensor electrónico diseñado para medir la cantidad total de sustancias orgánicas e inorgánicas disueltas en un líquido, lo que se expresa típicamente en partes por millón (ppm) o miligramos por litro (mg/l) \cite{TDS}. 
 
 \begin{figure}[H]
     \centering
@@ -106,7 +106,7 @@ Características:
 
 \subsection{Sensor de humedad capacitivo V2.0}
 
-El sensor de humedad capacitivo V2.0, figura \ref{fig:moisture}, mide los niveles de humedad mediante detección capacitiva en lugar de resistiva, como otros sensores disponibles. Fabricado con material resistente a la corrosión, ofrece una vida útil prolongada al insertarse en el sustrato alrededor de las plantas \cite{MOISTURE}.
+El sensor de humedad capacitivo V2.0, que se muestra en la figura \ref{fig:moisture}, mide los niveles de humedad mediante detección capacitiva en lugar de resistiva, como otros sensores disponibles. Fabricado con material resistente a la corrosión, ofrece una vida útil prolongada al insertarse en el sustrato alrededor de las plantas \cite{MOISTURE}.
 
 \begin{itemize}
 	\item Requiere alimentación entre 3,3 y 5,5 VDC.
@@ -128,7 +128,7 @@ El sensor de humedad capacitivo V2.0, figura \ref{fig:moisture}, mide los nivele
 
 \subsection{Sensor de temperatura digital DS18B20}
 
-El DS18B20, figura \ref{fig:ds18b20}, es un sensor de temperatura digital que proporciona mediciones en grados Celsius con una resolución configurable de 9 a 12 bits \cite{DS18B20}. %Este sensor se comunica a través de un bus 1-Wire, lo que significa que solo requiere una línea de datos (además de tierra) para la comunicación con un micontrolador. Cada DS18B20 tiene un código de serie único de 64 bits grabado en fábrica, lo que permite que múltiples sensores funcionen en el mismo bus 1-Wire, lo que permite la creación de redes de sensores de temperatura distribuidos.
+El DS18B20, que se muestra en la figura \ref{fig:ds18b20}, es un sensor de temperatura digital que proporciona mediciones en grados Celsius con una resolución configurable de 9 a 12 bits \cite{DS18B20}. %Este sensor se comunica a través de un bus 1-Wire, lo que significa que solo requiere una línea de datos (además de tierra) para la comunicación con un micontrolador. Cada DS18B20 tiene un código de serie único de 64 bits grabado en fábrica, lo que permite que múltiples sensores funcionen en el mismo bus 1-Wire, lo que permite la creación de redes de sensores de temperatura distribuidos.
 
 Características:
 
@@ -160,7 +160,7 @@ Características:
 
 \subsection{Sensor de luz ambiental digital BH1750}
 
-El circuito integrado BH1750, figura \ref{fig:BH1750}, es un sensor de luz ambiental digital con interfaz de bus I2C (\textit{Inter-Integrated Circuit}) \cite{BH1750}. Este sensor es capaz de detectar un amplio rango de intensidad luminosa, desde 1 hasta 65535 lux, con una resolución de 16 bits. El chip proporciona una salida digital directa, lo que elimina la necesidad de cálculos complejos.
+El circuito integrado BH1750, que se muestra en la figura \ref{fig:BH1750}, es un sensor de luz ambiental digital con interfaz de bus I2C (\textit{Inter-Integrated Circuit}) \cite{BH1750}. Este sensor es capaz de detectar un amplio rango de intensidad luminosa, desde 1 hasta 65 535 lx, con una resolución de 16 bits. El chip proporciona una salida digital directa, lo que elimina la necesidad de cálculos complejos.
 
 %Características:
 
@@ -184,7 +184,7 @@ El circuito integrado BH1750, figura \ref{fig:BH1750}, es un sensor de luz ambie
 
 
 \subsection{Raspberry Pi}
-Raspberry Pi es una plataforma de computación embebida basada en arquitectura ARM, capaz de ejecutar sistemas operativos Linux como Raspberry Pi OS. Dispone de interfaces GPIO, I²C, SPI y UART que permiten la interacción directa con sensores, actuadores y periféricos externos. Su bajo consumo energético, soporte para redes Ethernet/Wi-Fi y capacidad de procesamiento la convierten en una herramienta versátil para el desarrollo, prueba e implementación de sistemas embebidos y aplicaciones IoT \cite{raspi}.
+Raspberry Pi es una plataforma de computación embebida basada en arquitectura ARM \cite{arm}, capaz de ejecutar sistemas operativos Linux como Raspberry Pi OS \cite{raspi}. Dispone de interfaces GPIO \cite{gpio}, I²C \cite{I2C}, SPI \cite{spi} y UART \cite{uart} que permiten la interacción directa con sensores, actuadores y periféricos externos. Su bajo consumo energético, soporte para redes Ethernet/Wi-Fi \cite{ethernet}, \cite{wifi} y capacidad de procesamiento la convierten en una herramienta versátil para el desarrollo, prueba e implementación de sistemas embebidos y aplicaciones IoT \cite{raspi}.
 
 
 %https://mytectutor.com/bh1750-ambient-light-sensor-with-arduino/
@@ -206,13 +206,13 @@ FreeRTOS es un sistema operativo en tiempo real (RTOS) popular y de código abie
 
 \subsection{Ceedling}
 
-Ceedling es un framework de construcción y prueba para proyectos de software embebido en C. Automatiza tareas como la compilación, el enlazado y la ejecución de pruebas unitarias. Integra herramientas como Unity, CMock y Ruby. Facilita la adopción de prácticas de desarrollo basadas en pruebas (TDD) y asegura la calidad del código mediante la verificación automatizada de unidades de software individuales \cite{CEEDLING}.
+Ceedling es un framework de construcción y prueba para proyectos de software embebido en lenguaje de programación en C. Automatiza tareas como la compilación, el enlazado y la ejecución de pruebas unitarias. Integra herramientas como Unity, CMock y Ruby. Facilita la adopción de prácticas de desarrollo basadas en pruebas (TDD) y asegura la calidad del código mediante la verificación automatizada de unidades de software individuales \cite{CEEDLING}.
 
 \subsection{React}
 React es una biblioteca de código abierto desarrollada por Meta para crear interfaces de usuario dinámicas en aplicaciones web. Su enfoque basado en componentes y el uso del DOM virtual permiten desarrollar interfaces modulares y con un alto rendimiento, ideales para aplicaciones modernas y escalables \cite{reactnative}.
 
 \subsection{Docker}
-Docker es una plataforma de código abierto que permite empaquetar, distribuir y ejecutar aplicaciones en entornos aislados llamados contenedores. Estos contenedores garantizan que el software funcione de forma consistente en cualquier entorno, facilitando la portabilidad, la escalabilidad y la automatización del despliegue de aplicaciones \cite{docker}.
+Docker es una plataforma de código abierto que permite empaquetar, distribuir y ejecutar aplicaciones en entornos aislados llamados contenedores. Estos garantizan que el software funcione de forma consistente en cualquier entorno, facilitando la portabilidad, la escalabilidad y la automatización del despliegue de aplicaciones \cite{docker}.
 
 \section{Protocolos de comunicación empleados}
 

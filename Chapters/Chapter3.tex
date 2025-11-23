@@ -14,7 +14,7 @@ En la figura \ref{fig:d_bloques} se muestra el diagrama en bloques general del s
 	\label{fig:d_bloques}
 \end{figure}
 
-El sistema embebido implementado en este trabajo consta de una PCB centralizadora, diseñada para integrar y gestionar todos los módulos de hardware. Esta arquitectura asegura la alimentación, adaptación y protección de todos sus componentes. El sistema completo abarca desde la adquisición de datos mediante sensores hasta las acciones sobre el entorno a través de actuadores. Además, se complementa con una interfaz de usuario móvil para el monitoreo y control remoto.
+El sistema embebido implementado en este trabajo consta de una PCB (del inglés, \textit{Printed Circuit Board}) centralizadora, diseñada para integrar y gestionar todos los módulos de hardware. Esta arquitectura asegura la alimentación, adaptación y protección de todos sus componentes. El sistema completo abarca desde la adquisición de datos mediante sensores hasta las acciones sobre el entorno a través de actuadores. Además, se complementa con una interfaz de usuario móvil para el monitoreo y control remoto.
 
 A continuación, se describen brevemente los bloques y su función.
 
@@ -38,7 +38,7 @@ En la presente sección se aborda la arquitectura del firmware del microcontrola
 A continuación, se detallan los patrones de diseño arquitectónico utilizados.
 
 \subsubsection{Arquitectura en capas}
-Se adoptó un patrón de arquitectura en capas para estructurar el software desarrollado, lo que permitió una separación de funcionalidades clara mediante niveles de abstracción. Dicha metodología divide el sistema en niveles horizontales, cada uno con responsabilidades específicas y bien definidas, que facilita el desarrollo, la mantenibilidad y la escalabilidad del código.
+Se adoptó un patrón de arquitectura en capas para estructurar el software desarrollado, lo que permite una separación de funcionalidades clara mediante niveles de abstracción. Dicha metodología divide el sistema en niveles horizontales, cada uno con responsabilidades específicas y bien definidas, que facilita el desarrollo, la mantenibilidad y la escalabilidad del código.
 
 A continuación, se enumeran las capas de abstracción que constituyen el firmware.
 
@@ -55,12 +55,12 @@ Para facilitar la interacción con los diversos componentes de hardware y garant
 
 \subsubsection{Control ambiental}
 
-El patrón de control ambiental se adoptó como estrategia arquitectónica para la capa de aplicación. El sistema embebido requirió la monitorización y modificación del entorno mediante sensores y actuadores. Este patrón permitió la estructuración de la lógica de control y facilitó la gestión de las interacciones entre los componentes de hardware y la implementación de los algoritmos de control.
+El patrón de control ambiental se adoptó como estrategia arquitectónica para la capa de aplicación. El sistema embebido requirió la monitorización y modificación del entorno mediante sensores y actuadores. Este patrón permite estructurar la lógica de control y facilita la gestión de las interacciones entre los componentes de hardware y la implementación de los algoritmos de control.
 
 
 \subsection{Componentes}
 
-La capa de aplicación, figura \ref{fig:arq_bloques}, está constituida por los componentes de software encargados de gestionar cada una de las funcionalidades del sistema.
+Como se muestra en la figura \ref{fig:arq_bloques}, la capa de aplicación está constituida por los componentes de software encargados de gestionar cada una de las funcionalidades del sistema.
 
 A continuación, se describe brevemente la funcionalidad de cada uno de estos componentes.
 
@@ -71,7 +71,7 @@ A continuación, se describe brevemente la funcionalidad de cada uno de estos co
 	\item Monitor de pH: mide el nivel de acidez de la solución nutritiva, lo que ayuda a mantener el pH dentro del rango óptimo para el cultivo.
 	\item Monitor de humedad del sustrato: mide el contenido de humedad en el sustrato del cultivo.
 	\item Monitor de luz: mide la cantidad de luz disponible en el entorno a través de un sensor.
-	\item Servidor web embebido: el servidor web embebido permite la comunicación con el sistema de control del cultivo a través de la red. Este servidor permite monitorear, configurar y controlar el sistema desde cualquier dispositivo con acceso a la red.
+	\item Servidor web embebido: permite la comunicación con el sistema de control del cultivo a través de la red. Este servidor permite monitorear, configurar y controlar el sistema desde cualquier dispositivo con acceso a la red.
 	\item Control de ciclo de luz: este módulo se encarga de gestionar el ciclo de iluminación del cultivo. La configuración de dicho ciclo se realiza por medio de la interfaz de usuario.
 	\item Control de ciclo de oxigenación/ventilación: este componente activa y desactiva el flujo de aire en el sistema de cultivo según la configuración del usuario.
 	\item Control de hidratación: gestiona el riego, activa la bomba de agua y ajusta los niveles de humedad del sustrato según las mediciones del sensor de humedad. Esto asegura la cantidad adecuada de agua para el desarrollo de las plantas.
@@ -135,7 +135,7 @@ Una vez establecida la conexión, se inicia el servidor embebido y se habilita l
 La arquitectura sigue el patrón modular con módulos de software que ejecutan tareas de forma ordenada. El ciclo comienza en \texttt{main.c} con la inicialización del sistema a través del componente \texttt{Administrator}.
 
 \subsubsection*{Inicialización del sistema}
-La función \texttt{app\_main()}, figura \ref{fig:flujo:sistema}, crea la tarea \texttt{administrator\_callback} con alta prioridad, que actúa como un coordinador general que gestiona la interacción entre módulos y subsistemas.
+Como se ilustra en la figura \ref{fig:flujo:sistema}, la función \texttt{app\_main()} crea la tarea \texttt{administrator\_callback} con alta prioridad, que actúa como un coordinador general que gestiona la interacción entre módulos y subsistemas.
 
 Durante la inicialización, el \texttt{Administrator} configura el pool de memoria, inicializa el sistema de archivos, establece la conectividad Wi-Fi e inicia el servidor web.
 
@@ -178,7 +178,7 @@ Estos controladores operan de forma autónoma según la configuración estableci
 El sistema utiliza un mecanismo de \textit{publish/subscribe} (\texttt{pub\_sub.h}) que permite interacción desacoplada entre componentes. Los sensores publican mediciones en tópicos específicos, mientras los controladores se suscriben a comandos de actuación. El \texttt{Administrator} supervisa el flujo completo de información.
 
 \subsubsection*{Bucle principal de control}
-Una vez inicializado, el \texttt{Administrator} ejecuta un bucle principal de un segundo que realiza las funciones detalladas en la figura \ref{fig:flujo:sistema}:
+Una vez inicializado, el \texttt{Administrator} ejecuta un bucle principal que se repite cada segundo y realiza las funciones detalladas en la figura \ref{fig:flujo:sistema}:
 
 
 \begin{itemize}
@@ -221,21 +221,7 @@ El sistema está conformado por una placa principal que integra módulos indepen
 \subsection{Diseño electrónico}
 \label{sec:hw:design}
 % Explicar cómo se diseñaron las placas, esquemas, y conexiones eléctricas.
-El diseño electrónico se realizó en base a una arquitectura modular centralizada en una placa principal. Esta placa interconecta los adaptadores de señal de los módulos sensores junto con la distribución de la alimentación, la conexión y protección de las GPIOs del microcontrolador junto con la protección general del circuito. La placa tiene completamente integrada la interfaz de salida con circuitos de aislamiento galvánico y relés para cada actuador, que manejan 220 V de corriente alterna. Para la alimentación de los módulos se implementó un regulador lineal LM1117, y para adaptar el módulo de pH de 5 V a 3,3 V (nivel de referencia del ADC) se utilizó un divisor resistivo. Finalmente, se incorporó un \textit{shield} de salida con las GPIOs restantes para permitir la conexión de módulos adicionales en el futuro. Se empleó KiCad para la creación del circuito impreso (PCB), como se detalla en las figuras \ref{fig:esquematico:base} y \ref{fig:esquematico:reles}.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=1.0\textwidth]{./Figures/hw_base.png}
-\caption{Circuito de la placa centralizadora.}
-\label{fig:esquematico:base}
-\end{figure}
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.7\textwidth]{./Figures/hw_reles.png}
-\caption{Circuito de control de actuadores con aislamiento galvánico y relés para bomba, luces y ventiladores.}
-\label{fig:esquematico:reles}
-\end{figure}
+El diseño electrónico se realizó en base a una arquitectura modular centralizada en una placa principal. Esta placa interconecta los adaptadores de señal de los módulos sensores junto con la distribución de la alimentación, la conexión y protección de las GPIOs del microcontrolador junto con la protección general del circuito. La placa tiene completamente integrada la interfaz de salida con circuitos de aislamiento galvánico y relés para cada actuador, que manejan 220 V de corriente alterna. Para la alimentación de los módulos se implementó un regulador lineal LM1117, y para adaptar el módulo de pH de 5 V a 3,3 V (nivel de referencia del ADC) se utilizó un divisor resistivo. Finalmente, se incorporó un \textit{shield} de salida con las GPIOs restantes para permitir la conexión de módulos adicionales en el futuro.
 
 \subsubsection*{Módulo de control principal}
 % Describir el microcontrolador, sus interfaces y funciones.
@@ -256,6 +242,22 @@ Los actuadores fueron integrados para el control automatizado de las condiciones
 \end{itemize}
 
 El control de los actuadores se implementa mediante el sistema de relés mecanicos descrito en la sección \ref{sec:hw:design}, con interfaz a través de las salidas GPIO.
+
+El diseño del PCB se realizó en KiCad. La figura \ref{fig:esquematico:base} muestra el acondicionamiento de señal para los módulos de TDS y pH, junto con los circuitos de protección y regulación de tensión. La figura \ref{fig:esquematico:reles} muestra la interfaz de salida para la bomba de agua. Los demás actuadores emplean un circuito similar. Ambos esquemas forman parte de la placa centralizadora.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{./Figures/circuit_sensor.png}
+\caption{Vista parcial del circuito de la placa centralizadora que muestra la interconexión de los módulos de TDS y pH con el microcontrolador y el circuito de acondicionamiento de señal.}
+\label{fig:esquematico:base}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{./Figures/pump_hw.png}
+\caption{Circuito de control de la bomba con aislamiento galvánico y relé de potencia.}
+\label{fig:esquematico:reles}
+\end{figure}
 
 \subsection{Alimentación}
 % Explicar fuentes, reguladores y protecciones eléctricas.
@@ -409,7 +411,7 @@ La figura \ref{fig:ui} muestra la secuencia de renderizado de una vista.
 
 \subsection{Seguridad y autenticación}
 % Describir autenticación de usuarios, cifrado, etc.
-La seguridad de las comunicaciones se garantiza mediante un sistema de autenticación basado en tokens. Como se ilustra en la figura \ref{fig:login_sec}, cuando el usuario ingresa las credenciales, el componente \texttt{Login} envía una petición POST a la API. Si las credenciales son válidas, la API responde con una clave de acceso que el \texttt{AuthProvider} almacena en el \texttt{localStorage} del navegador. Finalmente, el usuario es redirigido al \texttt{Dashboard}.
+La seguridad de las comunicaciones se garantiza mediante un sistema de autenticación basado en tokens. Como se ilustra en la figura \ref{fig:login_sec}, cuando el usuario ingresa las credenciales, el componente \texttt{Login} envía una petición \texttt{POST} a la API. Si las credenciales son válidas, la API responde con una clave de acceso que el \texttt{AuthProvider} almacena en el \texttt{localStorage} del navegador. Finalmente, el usuario es redirigido al \texttt{Dashboard}.
 
 \begin{figure}[H]
     \centering
@@ -432,7 +434,7 @@ La figura \ref{fig:sensores} muestra el diagrama de secuencia que describe la in
 
 \subsection{Control de actuadores}
 % Describir cómo el usuario controla actuadores o configuraciones.
-En esta vista, el usuario tiene la capacidad de activar o desactivar manualmente los actuadores, como la bomba de riego, la iluminación y la ventilación, mientras visualiza el estado actual de cada uno de ellos (ver figura \ref{fig:actuadores_sec}). Las acciones se transmiten al backend embebido mediante solicitudes \texttt{POST} y \texttt{GET} a los endpoints correspondientes.
+A través de esta vista, el usuario puede activar o desactivar manualmente los actuadores, como la bomba de riego, la iluminación y la ventilación, mientras visualiza el estado actual de cada uno de ellos (ver figura \ref{fig:actuadores_sec}). Las acciones se transmiten al backend embebido mediante solicitudes \texttt{POST} y \texttt{GET} a los endpoints correspondientes.
 
 \begin{figure}[H]
     \centering
