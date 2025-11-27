@@ -16,7 +16,7 @@ En la figura \ref{fig:d_bloques} se muestra el diagrama en bloques general del s
 
 El sistema embebido implementado en este trabajo consta de una PCB (del inglés, \textit{Printed Circuit Board}) centralizadora, diseñada para integrar y gestionar todos los módulos de hardware. Esta arquitectura asegura la alimentación, adaptación y protección de todos sus componentes. El sistema completo abarca desde la adquisición de datos mediante sensores hasta las acciones sobre el entorno a través de actuadores. Además, se complementa con una interfaz de usuario móvil para el monitoreo y control remoto.
 
-A continuación, se describen brevemente los bloques y su función.
+A continuación, se describen brevemente los bloques y su función:
 
 \begin{itemize}
 	\item Sensores: este bloque se encarga de la transducción de magnitudes físicas en señales eléctricas, lo que permite la digitalización de variables ambientales de interés para el control del cultivo.
@@ -40,7 +40,7 @@ A continuación, se detallan los patrones de diseño arquitectónico utilizados.
 \subsubsection{Arquitectura en capas}
 Se adoptó un patrón de arquitectura en capas para estructurar el software desarrollado, lo que permite una separación de funcionalidades clara mediante niveles de abstracción. Dicha metodología divide el sistema en niveles horizontales, cada uno con responsabilidades específicas y bien definidas, que facilita el desarrollo, la mantenibilidad y la escalabilidad del código.
 
-A continuación, se enumeran las capas de abstracción que constituyen el firmware.
+A continuación, se enumeran las capas de abstracción que constituyen el firmware:
 
 \begin{itemize}
 	\item Capa de aplicación.
@@ -62,7 +62,7 @@ El patrón de control ambiental se adoptó como estrategia arquitectónica para 
 
 Como se muestra en la figura \ref{fig:arq_bloques}, la capa de aplicación está constituida por los componentes de software encargados de gestionar cada una de las funcionalidades del sistema.
 
-A continuación, se describe brevemente la funcionalidad de cada uno de estos componentes.
+A continuación, se describe brevemente la funcionalidad de cada uno de estos componentes:
 
 \begin{itemize}
 	\item Monitor de temperatura: mide la temperatura de la solución nutritiva para garantizar que las plantas crezcan en un entorno térmicamente adecuado.
@@ -135,7 +135,7 @@ Una vez establecida la conexión, se inicia el servidor embebido y se habilita l
 La arquitectura sigue el patrón modular con módulos de software que ejecutan tareas de forma ordenada. El ciclo comienza en \texttt{main.c} con la inicialización del sistema a través del componente \texttt{Administrator}.
 
 \subsubsection*{Inicialización del sistema}
-Como se ilustra en la figura \ref{fig:flujo:sistema}, la función \texttt{app\_main()} crea la tarea \texttt{administrator\_callback} con alta prioridad, que actúa como un coordinador general que gestiona la interacción entre módulos y subsistemas.
+Como se ilustra en la figura \ref{fig:flujo:sistema}, la función \texttt{app\_main()} crea la tarea \texttt{admi\-nistrator\_callback} con alta prioridad, que actúa como un coordinador general que gestiona la interacción entre módulos y subsistemas.
 
 Durante la inicialización, el \texttt{Administrator} configura el pool de memoria, inicializa el sistema de archivos, establece la conectividad Wi-Fi e inicia el servidor web.
 
